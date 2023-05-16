@@ -14,10 +14,10 @@ public class RequestsRestApi {
         restApi.get("/requests").handler(context -> {
             final JsonArray response = new JsonArray();
             response
-              .add(new JsonObject().put("azienda", "pippo"))
-              .add(new JsonObject().put("azienda", "pluto"))
-              .add(new JsonObject().put("azienda", "rossi"))
-              .add(new JsonObject().put("azienda", "mario"));
+              .add(new Request("pippo"))
+              .add(new Request("pluto"))
+              .add(new Request("mario"))
+              .add(new Request("rossi"));
             LOG.info("Path {} responds with {}", context.normalizedPath(), response.encode());
             context.response().end(response.toBuffer());
           });
