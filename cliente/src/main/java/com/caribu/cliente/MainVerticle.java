@@ -15,7 +15,8 @@ import io.vertx.ext.web.RoutingContext;
 public class MainVerticle extends AbstractVerticle {
 
   private static final Logger LOG = LoggerFactory.getLogger(MainVerticle.class);
-  
+  public static final int PORT = 8888;
+
   public static void main(String[] args) {
     var vertx = Vertx.vertx();
     vertx.exceptionHandler(error -> 
@@ -36,13 +37,14 @@ public class MainVerticle extends AbstractVerticle {
     final Router restApi = Router.router(vertx); //restApi IS the router
     restApi.route().failureHandler(handleFailure());
     
-    RequestsRestApi.attach(restApi);
+    CompaniesRestApi.attach(restApi);
+    CompanyRequestsApi.attach(restApi);
 
     //creates HTTP server
     vertx.createHttpServer()
     .requestHandler(restApi)
     .exceptionHandler(error -> LOG.error("HTTP Server error: ", error))
-    .listen(8888, http -> {
+    .listen(PORT, http -> {
       if (http.succeeded()) {
         startPromise.complete();
         LOG.info("HTTP server started on port 8888");
