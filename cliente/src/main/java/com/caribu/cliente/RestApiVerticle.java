@@ -13,6 +13,9 @@ import io.vertx.core.Promise;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.sqlclient.Pool;
+import io.vertx.sqlclient.PoolOptions;
 
 public class RestApiVerticle extends AbstractVerticle {
     private static final Logger LOG = LoggerFactory.getLogger(RestApiVerticle.class);
@@ -30,10 +33,13 @@ public class RestApiVerticle extends AbstractVerticle {
 
 
   private void startHttpServerAndAttachRoutes(Promise<Void> startPromise, final ClientConfig configuration) {
+    // Create DB Pool (for scaling)
+    Pool db = createDbPool(configuration);
+
     final Router restApi = Router.router(vertx); //restApi IS the router
     restApi.route().failureHandler(handleFailure());
     
-    CompaniesRestApi.attach(restApi);
+    CompaniesRestApi.attach(restApi, db); //pass database connection to CompaniesRestApi
 
     //creates HTTP server
     vertx.createHttpServer()
@@ -47,6 +53,21 @@ public class RestApiVerticle extends AbstractVerticle {
         startPromise.fail(http.cause());
       }
     });
+  }
+
+
+
+  private Pool createDbPool(final ClientConfig configuration) {
+    final var connectOptions = new PgConnectOptions()
+      .setHost(configuration.getDbConfig().getHost()) //get host from configurations
+      .setPort(configuration.getDbConfig().getPort()) //get port from configurations
+      .setDatabase(configuration.getDbConfig().getDatabase()) //get database from configurations
+      .setUser(configuration.getDbConfig().getUser()) //get user from configurations
+      .setPassword(configuration.getDbConfig().getPassword()); //get password from configurations
+
+    var poolOptions = new PoolOptions().setMaxSize(4); //set max pool size to 5 //possible error here?
+     
+    return Pool.pool(vertx, connectOptions, poolOptions);
   }
 
   private Handler<RoutingContext> handleFailure() {

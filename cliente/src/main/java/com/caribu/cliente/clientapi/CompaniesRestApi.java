@@ -10,6 +10,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.sqlclient.Pool;
 
 public class CompaniesRestApi {
 
@@ -24,10 +25,14 @@ public class CompaniesRestApi {
     );
 
 
-    public static void attach(Router parent){
+    public static void attach(Router parent, final Pool db){
         final String path = "/client/:clientId";
         parent.get("/client").handler(new GetAllClientsHandler());
         parent.get(path).handler(new GetClientsHandler());
+
+        parent.get("/pg/clients").handler(new GetClientsFromDatabaseHandler(db));
+        parent.get("/pg/client/:clientId").handler(new GetClientDetailsFromDatabaseHandler(db));
+
         //parent.put(path).handler(new PutClientsHandler());
         //parent.delete(path).handler(new DeleteClientsHandler());
     }

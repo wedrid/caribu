@@ -44,6 +44,7 @@ public class MainVerticle extends AbstractVerticle {
       .onSuccess(id -> LOG.info("Migrated database to latest version "))
       .compose(next -> deployRestApiVerticle(startPromise));
       }
+      
 
   private Future<Void> migrateDatabase() {
     return ConfigLoader.load(vertx)
