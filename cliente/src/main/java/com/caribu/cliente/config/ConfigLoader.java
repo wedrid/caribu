@@ -20,8 +20,15 @@ public class ConfigLoader {
 
     private static final Logger LOG = LoggerFactory.getLogger(ConfigLoader.class);
 
+    // Exposed Environment variables
     public static final String SERVER_PORT = "SERVER_PORT"; 
-    static final List<String> EXPOSED_ENVIRONMENT_VARIABLES = Arrays.asList(SERVER_PORT);
+    // add database variables
+    public static final String DB_HOST = "DB_HOST";
+    public static final String DB_PORT = "DB_PORT";
+    public static final String DB_DATABASE = "DB_DATABASE";
+    public static final String DB_USER = "DB_USER";
+    public static final String DB_PASSWORD = "DB_PASSWORD";
+    static final List<String> EXPOSED_ENVIRONMENT_VARIABLES = Arrays.asList(SERVER_PORT, DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD);
 
     public static Future<ClientConfig> load(Vertx vertx){
 

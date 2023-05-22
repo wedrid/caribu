@@ -20,6 +20,7 @@ public class FlywayMigration {
     private static final Logger LOG = LoggerFactory.getLogger(FlywayMigration.class);
 
     public static Future<Void> migrate(final Vertx vertx, final DbConfig dbConfig){
+        LOG.debug("DB Config: {}", dbConfig);
         return vertx.<Void>executeBlocking(promise -> {
             execute(dbConfig); // because the content of the method is blocking (uses jdbc) and we want to put it in the non blocking event loop
             promise.complete();
