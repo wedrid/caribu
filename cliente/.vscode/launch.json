@@ -1,0 +1,14 @@
+{
+    "configurations": [
+    {
+        "type": "java",
+        "name": "Launch with Arguments Prompt",
+        "request": "launch",
+        "mainClass": "com.caribu.cliente.MainVerticle",
+        //"args": "${command:SpecifyProgramArgs}",
+        "env": {
+            //"SERVER_PORT": "8888"
+        }
+    }
+    ]
+}
