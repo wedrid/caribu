@@ -23,9 +23,9 @@ public class GetClientDetailsFromDatabaseHandler implements Handler<RoutingConte
 
     @Override
     public void handle(RoutingContext context) {
-        final String clientParam = context.pathParam("clientId");
+        //final String clientParam = context.pathParam("clientId");
+        final String clientParam = CompaniesRestApi.getClientId(context);
         Number clientId = Integer.parseInt(clientParam); // convert to Number
-        LOG.info("Client id parameter: {}", clientParam);
         
         // forQuery should be used when we expect a return parameter
         SqlTemplate

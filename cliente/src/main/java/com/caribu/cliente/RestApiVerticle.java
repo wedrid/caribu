@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.caribu.cliente.clientapi.CompaniesRestApi;
 import com.caribu.cliente.config.ClientConfig;
 import com.caribu.cliente.config.ConfigLoader;
+import com.caribu.richiesta.requestapi.RequestsRestApi;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
@@ -39,7 +40,9 @@ public class RestApiVerticle extends AbstractVerticle {
     final Router restApi = Router.router(vertx); //restApi IS the router
     restApi.route().failureHandler(handleFailure());
     
+    
     CompaniesRestApi.attach(restApi, db); //pass database connection to CompaniesRestApi
+    RequestsRestApi.attach(restApi, db);
 
     //creates HTTP server
     vertx.createHttpServer()
@@ -54,7 +57,6 @@ public class RestApiVerticle extends AbstractVerticle {
       }
     });
   }
-
 
 
   private Pool createDbPool(final ClientConfig configuration) {

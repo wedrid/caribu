@@ -1,0 +1,13 @@
+PUT http://localhost:8888/pg/request/3
+content-type: application/json
+
+{
+    "client_id": 1,
+    "request_date": 20232303,
+    "filiale_id": 1,
+    "depth": 10,
+    "width": 10,
+    "height": 10,
+    "weight": 100,
+    "tratta_id": 1
+}

@@ -15,7 +15,7 @@ import io.vertx.sqlclient.Pool;
 public class CompaniesRestApi {
 
     private static final Logger LOG = LoggerFactory.getLogger(CompaniesRestApi.class);
-    public static final List<Client> CLIENTS = Arrays.asList(
+    public static final List<Client> CLIENTS = Arrays.asList( //TODO: remove when refactoring 
         new Client("pippo"),
         new Client("rossi"),
         new Client("pluto"),
@@ -32,6 +32,7 @@ public class CompaniesRestApi {
 
         parent.get("/pg/clients").handler(new GetClientsFromDatabaseHandler(db));
         parent.get("/pg/client/:clientId").handler(new GetClientDetailsFromDatabaseHandler(db));
+        //parent.put("/pg/client/:clientId").handler(new PutClientDetailsFromDatabaseHandler(db));
 
         //parent.put(path).handler(new PutClientsHandler());
         //parent.delete(path).handler(new DeleteClientsHandler());
