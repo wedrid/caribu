@@ -42,7 +42,7 @@ public class RestApiVerticle extends AbstractVerticle {
     
     
     CompaniesRestApi.attach(restApi, db); //pass database connection to CompaniesRestApi
-    RequestsRestApi.attach(restApi, db);
+    RequestsRestApi.attach(restApi, db); 
 
     //creates HTTP server
     vertx.createHttpServer()

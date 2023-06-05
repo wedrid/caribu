@@ -1,0 +1,77 @@
+openapi: 3.0.0
+info:
+  title: API Gateway
+  version: 1.0.0
+  description: API Gateway for managing requests
+
+paths:
+  /ping:
+    get: 
+      summary: Ping API Gateway
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+  /requests:
+    get:
+      summary: Get all requests
+      operationId: getAllRequests
+      responses:
+        '200':
+          description: OK
+    post:
+      summary: Create a new request
+      operationId: createRequest
+      responses:
+        '201':
+          description: Created
+  /requests/{requestId}:
+    get:
+      summary: Get a request by ID
+      operationId: getRequestById
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Request not found
+    put:
+      summary: Update a request
+      operationId: updateRequest
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: Request not found
+    delete:
+      summary: Delete a request
+      operationId: deleteRequest
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: integer
+          required: true
+      responses:
+        '204':
+          description: No Content
+
+components:
+  schemas:
+    Request:
+      type: object
+      properties:
+        id:
+          type: integer
+        # Add other properties for request
