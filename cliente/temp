@@ -1,0 +1,25 @@
+      // Create Service Discovery instance
+      discovery = ServiceDiscovery.create(vertx);
+
+      // Create HTTP server
+      vertx.createHttpServer()
+      .requestHandler(restApi)
+      .exceptionHandler(error -> LOG.error("HTTP Server error: ", error))
+      .listen(configuration.getServerPort(), http -> {
+        if (http.succeeded()) {
+          // Publish the HTTP endpoint to Service Discovery
+          discovery.publish(
+            HttpEndpoint.createRecord("rest-api", "localhost", configuration.getServerPort(), "/"),
+            ar -> {
+              if (ar.succeeded()) {
+                startPromise.complete();
+                LOG.info("HTTP server started on port {}", configuration.getServerPort());
+              } else {
+                startPromise.fail(ar.cause());
+              }
+            }
+          );
+        } else {
+          startPromise.fail(http.cause());
+        }
+      });

@@ -12,20 +12,20 @@ import org.slf4j.LoggerFactory;
 
 import com.caribu.cliente.config.DbConfig;
 
-import io.vertx.core.Future;
-import io.vertx.core.Vertx;
+import io.reactivex.rxjava3.core.Completable;
+import io.vertx.rxjava3.core.Vertx;
+
 
 public class FlywayMigration {
 
     private static final Logger LOG = LoggerFactory.getLogger(FlywayMigration.class);
 
-    public static Future<Void> migrate(final Vertx vertx, final DbConfig dbConfig){
-        LOG.debug("DB Config: {}", dbConfig);
+    public static Completable migrate(final Vertx vertx, final DbConfig dbConfig) {
         return vertx.<Void>executeBlocking(promise -> {
-            execute(dbConfig); // because the content of the method is blocking (uses jdbc) and we want to put it in the non blocking event loop
+            execute(dbConfig);
             promise.complete();
-        })
-        .onFailure(err -> LOG.error("Error while migrating DB schema with exception error: {}", err));
+        }).doOnError(err -> LOG.error("Failed to migrate db schema with error: ", err))
+        .ignoreElement(); // Convert Single<Void> to Completable
     }
 
     private static void execute(final DbConfig dbConfig) {

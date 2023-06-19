@@ -42,5 +42,4 @@ public class GetRequestsFromDatabaseHandler implements Handler<RoutingContext>{
                     .end(response.toBuffer());
             });
     }
-
 }

@@ -1,0 +1,35 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}",
+            "args": []
+        },
+        {
+            "type": "java",
+            "name": "APIGatewayVerticle",
+            "request": "launch",
+            "mainClass": "com.caribu.apigateway.APIGatewayVerticle",
+            "projectName": "apigateway",
+            "args": [
+                "--add-modules",
+                "java.se",
+                "--add-exports",
+                "java.base/jdk.internal.ref=ALL-UNNAMED",
+                "--add-opens",
+                "java.base/java.lang=ALL-UNNAMED",
+                "--add-opens",
+                "java.base/java.nio=ALL-UNNAMED",
+                "--add-opens",
+                "java.base/sun.nio.ch=ALL-UNNAMED",
+                "--add-opens",
+                "java.management/sun.management=ALL-UNNAMED",
+                "--add-opens",
+                "jdk.management/com.sun.management.internal=ALL-UNNAMED"
+            ]
+        }
+    ]
+}

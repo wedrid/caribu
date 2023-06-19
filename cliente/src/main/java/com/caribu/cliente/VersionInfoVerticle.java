@@ -5,20 +5,20 @@ import org.slf4j.LoggerFactory;
 
 import com.caribu.cliente.config.ConfigLoader;
 
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.Promise;
+import io.reactivex.rxjava3.core.Completable;
+import io.vertx.rxjava3.core.AbstractVerticle;
 
-public class VersionInfoVerticle extends AbstractVerticle{
 
-    private static final Logger LOG = LoggerFactory.getLogger(VersionInfoVerticle.class);
+public class VersionInfoVerticle extends AbstractVerticle {
 
-    @Override
-    public void start(final Promise<Void> startPromise) throws Exception{
-    ConfigLoader.load(vertx)
-            .onFailure(startPromise::fail)
-            .onSuccess(configuration -> {
-                LOG.info("Current application version: {}", configuration.getVersion());
-                startPromise.complete();
-        });
+  private static final Logger LOG = LoggerFactory.getLogger(VersionInfoVerticle.class);
+
+  @Override
+  public Completable rxStart() {
+      return ConfigLoader.load(vertx)
+        .doOnSuccess(configuration -> LOG.info("Current Application Version is: {}", configuration.getVersion()))
+        .doOnError(throwable -> LOG.error("Failed to load configuration", throwable))
+         .ignoreElement();
     }
 }
+

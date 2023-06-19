@@ -12,60 +12,68 @@ paths:
       responses:
         '200':
           description: OK
-  /requests:
+  /pg/requests:
     get:
-      summary: Get all requests
+      summary: Get all requests 
       operationId: getAllRequests
       responses:
         '200':
           description: OK
+  #   /requests/requests:
+  #     get:
+  #       summary: Get all requests 
+  #       operationId: getAllRequests
+  #       responses:
+  #         '200':
+  #           description: OK
+  /serviceDiscoveryTrial: 
+    get:
+      summary: A trial
+      operationId: discoveryTrial
+      responses:
+        '200':
+          description: OK
+  /requests/newRequest:
     post:
       summary: Create a new request
-      operationId: createRequest
+      operationId: createNewRequest
       responses:
-        '201':
-          description: Created
-  /requests/{requestId}:
+        '200':
+          description: OK
+  /requests/request/{id}:
     get:
-      summary: Get a request by ID
+      summary: Get a request by id
       operationId: getRequestById
-      parameters:
-        - in: path
-          name: requestId
-          schema:
-            type: integer
-          required: true
       responses:
         '200':
           description: OK
-        '404':
-          description: Request not found
     put:
-      summary: Update a request
-      operationId: updateRequest
-      parameters:
-        - in: path
-          name: requestId
-          schema:
-            type: integer
-          required: true
+      summary: Update a request by id
+      operationId: updateRequestById
       responses:
         '200':
           description: OK
-        '404':
-          description: Request not found
     delete:
-      summary: Delete a request
-      operationId: deleteRequest
-      parameters:
-        - in: path
-          name: requestId
-          schema:
-            type: integer
-          required: true
+      summary: Delete a request by id
+      operationId: deleteRequestById
       responses:
-        '204':
-          description: No Content
+        '200':
+          description: OK
+  /reqapi/requests:
+    get:
+      summary: Get all requests from service discovery commesse api 
+      operationId: getRequestsFromCommesseApi
+      responses:
+        '200':
+          description: OK
+  /provaProxyy: 
+    get: 
+      summary: proxy prova
+      operationId: provaProxy
+      responses:
+        '200':
+          description: OK
+
 
 components:
   schemas:

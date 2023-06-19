@@ -1,0 +1,102 @@
+openapi: 3.0.0
+info:
+  title: API Gateway
+  version: 1.0.0
+  description: API Gateway for managing requests
+
+paths:
+  /reqapi/clients:
+    get:
+      summary: Get all clients 
+      operationId: getAllClients
+      responses:
+        '200':
+          description: OK
+    post: 
+      summary: Create a new client
+      operationId: createClient
+      responses: 
+        '201':
+          description: Created
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+  /reqapi/clients/{id}:
+    get:
+      summary: Get a client by id
+      operationId: getClientById
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not found
+    put:
+      summary: Update a client by id
+      operationId: updateClientById
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not found
+    delete:
+      summary: Delete a client by id
+      operationId: deleteClientById
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not found
+
+  /reqapi/requests:
+    get:
+      summary: Get all requests 
+      operationId: getAllRequests
+      responses:
+        '200':
+          description: OK
+    post: 
+      summary: Create a new request
+      operationId: createRequest
+      responses: 
+        '201':
+          description: Created
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+          
+  /reqapi/requests/{id}:
+    get:
+      summary: Get a request by id
+      operationId: getRequestById
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not found
+    put:
+      summary: Update a request by id
+      operationId: updateRequestById
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not found
+    delete:
+      summary: Delete a request by id
+      operationId: deleteRequestById
+      responses: 
+        '200':
+          description: OK
+        '404':
+          description: Not found
+        
+components:
+  schemas:
+    Request:
+      type: object
+      properties:
+        id:
+          type: integer
+        # Add other properties for request
