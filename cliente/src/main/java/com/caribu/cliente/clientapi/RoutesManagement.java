@@ -55,25 +55,24 @@ public class RoutesManagement extends AbstractVerticle{
     RouterBuilder.create(vertx, "endpoints.yaml")
         .doOnSuccess(routerBuilder -> { // (1)
           LOG.info("FUORI router");
+          
           routerBuilder.operation("getAllClients").handler(new RxGetAllClientsHandler(db));
-        //TODO
-        // routerBuilder.operation("listQuotes").handler(new GetSameTratta(db)); // (3)
-        
-        
-        Router restApi = routerBuilder.createRouter();
-        restApi.route().handler(BodyHandler.create());
-      
-        restApi.route().handler(this::failureHandler);
+          routerBuilder.operation("addNewClient").handler(new RxAddNewClientHandler(db));
+          routerBuilder.operation("createNewRequest").handler(new RxCreateNewRequestHandler(db));
 
-        Single<HttpServer> single = vertx.createHttpServer()
-          .requestHandler(restApi)
-          .rxListen(10001,"localhost");
-          single.subscribe(
-            server -> {LOG.info("Server Start");
-            },
-            failure -> {LOG.error("Server could not start: (1) " + failure.getMessage(), failure);
-            }
-          );       
+          Router restApi = routerBuilder.createRouter();
+
+          restApi.route().handler(this::failureHandler);
+          restApi.route().handler(BodyHandler.create());
+          Single<HttpServer> single = vertx.createHttpServer()
+            .requestHandler(restApi)
+            .rxListen(10001,"localhost");
+            single.subscribe(
+              server -> {LOG.info("Server Start");
+              },
+              failure -> {LOG.error("Server could not start: (1) " + failure.getMessage(), failure);
+              }
+            );
       }).doOnError(cause -> { 
             LOG.error("Server could not start: (2)" + cause.getMessage(), cause);
     }).subscribe();

@@ -1,0 +1,18 @@
+POST http://localhost:10001/reqapi/requests
+content-type: application/json
+
+{
+    "client_id": 2,
+    "request_date": "2020-01-01 11:30:30",
+    "filiale_id": 0,
+    "origin_lat": 42.123456,
+    "origin_long": 12.123456,
+    "destination_lat": 42.123456,
+    "destination_long": 11.123456,
+    "depth": 10,
+    "width": 10,
+    "height": 10,
+    "weight": 50,
+    "tratta_id": 0,
+    "due_date": "2020-01-02 12:12:12"
+}

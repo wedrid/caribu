@@ -1,0 +1,6 @@
+POST http://localhost:10001/reqapi/clients
+content-type: application/json
+
+{
+    "company_name": "Pluto Sas"
+}

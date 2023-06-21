@@ -21,7 +21,8 @@ public class PutClientDetailsFromDatabaseHandler implements Handler<RoutingConte
     @Override
     public void handle(final RoutingContext context){
         var clientId = CompaniesRestApi.getClientId(context);
-        var json = context.getBodyAsJson();
+        var body = context.body();
+
     }
 }
 

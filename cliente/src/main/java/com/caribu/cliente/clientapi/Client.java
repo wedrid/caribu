@@ -35,6 +35,7 @@ public class Client {
         Random random = new Random();
         return BigDecimal.valueOf(random.nextDouble());
     }
+    
     public JsonObject toJsonObject() {
         return JsonObject.mapFrom(this);
     }

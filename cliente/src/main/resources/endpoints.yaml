@@ -6,15 +6,15 @@ info:
 
 paths:
   /reqapi/clients:
-    get:
-      summary: Get all clients 
+    get: 
+      summary: Get all clients
       operationId: getAllClients
       responses:
         '200':
           description: OK
-    post: 
-      summary: Create a new client
-      operationId: createClient
+    post:
+      summary: Create a new request
+      operationId: addNewClient
       responses: 
         '201':
           description: Created
@@ -22,76 +22,112 @@ paths:
           description: Bad request
         '500':
           description: Internal server error
-  /reqapi/clients/{id}:
+      
+  /reqapi/clients/{clientId}:
     get:
-      summary: Get a client by id
+      summary: Get a request by ID
       operationId: getClientById
-      responses: 
+      parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: integer
+          required: true
+      responses:
         '200':
           description: OK
         '404':
-          description: Not found
+          description: Request not found
     put:
-      summary: Update a client by id
+      summary: Update a client
       operationId: updateClientById
-      responses: 
+      parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: integer
+          required: true
+      responses:
         '200':
           description: OK
         '404':
-          description: Not found
+          description: Request not found
     delete:
-      summary: Delete a client by id
+      summary: Delete a request
       operationId: deleteClientById
-      responses: 
+      parameters:
+        - in: path
+          name: clientId
+          schema:
+            type: integer
+          required: true
+      responses:
+        '204':
+          description: No Content
+
+  /reqapi/requests/open:
+    get: 
+      summary: Get all open requests
+      operationId: getAllOpenRequests
+      responses:
         '200':
           description: OK
-        '404':
-          description: Not found
-
+      
   /reqapi/requests:
     get:
-      summary: Get all requests 
+      summary: Get all requests
       operationId: getAllRequests
       responses:
         '200':
           description: OK
-    post: 
+    post:
       summary: Create a new request
-      operationId: createRequest
-      responses: 
+      operationId: createNewRequest
+      responses:
         '201':
           description: Created
-        '400':
-          description: Bad request
-        '500':
-          description: Internal server error
-          
-  /reqapi/requests/{id}:
+  /reqapi/requests/{requestId}:
     get:
-      summary: Get a request by id
+      summary: Get a request by ID
       operationId: getRequestById
-      responses: 
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: integer
+          required: true
+      responses:
         '200':
           description: OK
         '404':
-          description: Not found
+          description: Request not found
     put:
-      summary: Update a request by id
+      summary: Update a request
       operationId: updateRequestById
-      responses: 
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: integer
+          required: true
+      responses:
         '200':
           description: OK
         '404':
-          description: Not found
+          description: Request not found
     delete:
-      summary: Delete a request by id
+      summary: Delete a request
       operationId: deleteRequestById
-      responses: 
-        '200':
-          description: OK
-        '404':
-          description: Not found
-        
+      parameters:
+        - in: path
+          name: requestId
+          schema:
+            type: integer
+          required: true
+      responses:
+        '204':
+          description: No Content
+
 components:
   schemas:
     Request:
@@ -100,3 +136,8 @@ components:
         id:
           type: integer
         # Add other properties for request
+    Client: 
+      type: object
+      properties: 
+        id: 
+          type: integer

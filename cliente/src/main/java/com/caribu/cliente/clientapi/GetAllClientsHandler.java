@@ -22,7 +22,6 @@ public class GetAllClientsHandler implements Handler<RoutingContext>{
     @Override
     public void handle(final RoutingContext context) {
         var allClients = CompaniesRestApi.CLIENTS;
-        //var watchList = Optional.ofNullable(watchListPerAccount.get(UUID.fromString(accountId)));
         if (allClients == null) { //to change 
         context.response()
             .setStatusCode(HttpResponseStatus.NOT_FOUND.code())
