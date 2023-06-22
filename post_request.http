@@ -14,5 +14,6 @@ content-type: application/json
     "height": 10,
     "weight": 50,
     "tratta_id": 0,
+    "status": "active",
     "due_date": "2020-01-02 12:12:12"
 }

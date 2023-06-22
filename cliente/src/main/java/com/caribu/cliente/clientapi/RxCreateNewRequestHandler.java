@@ -66,9 +66,10 @@ public class RxCreateNewRequestHandler implements Handler<RoutingContext>{
         parameters.put("weight", requestBody.getInteger("weight"));
         parameters.put("tratta_id", requestBody.getInteger("tratta_id")); //TODO change to origin destination
         parameters.put("due_date", LocalDateTime.parse(requestBody.getString("due_date"), formatter));
+        parameters.put("status", requestBody.getString("status"));
         
         SqlTemplate.forUpdate(db,
-            "INSERT INTO client.requests (client_id, request_date, origin, destination, filiale_id, depth, height, width, weight, due_date, created_at) VALUES (#{client_id}, #{request_date}, point(#{origin_lat},#{origin_long}), point(#{destination_lat},#{destination_long}), #{filiale_id}, #{depth}, #{height}, #{width}, #{weight}, #{due_date}, current_date)")
+            "INSERT INTO client.requests (client_id, request_date, origin, destination, filiale_id, depth, height, width, weight, due_date, created_at, status) VALUES (#{client_id}, #{request_date}, point(#{origin_lat},#{origin_long}), point(#{destination_lat},#{destination_long}), #{filiale_id}, #{depth}, #{height}, #{width}, #{weight}, #{due_date}, current_date, #{status})")
         .rxExecute(parameters)
         .doOnError(err -> {
             LOG.debug("Failure: ", err , err.getMessage());
