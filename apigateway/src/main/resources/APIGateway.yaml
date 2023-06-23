@@ -19,13 +19,13 @@ paths:
       responses:
         '200':
           description: OK
-  #   /requests/requests:
-  #     get:
-  #       summary: Get all requests 
-  #       operationId: getAllRequests
-  #       responses:
-  #         '200':
-  #           description: OK
+  /reqapi/clients: 
+    get: 
+      summary: Get all clients
+      operationId: getAllClients
+      responses:
+        '200':
+          description: OK
   /serviceDiscoveryTrial: 
     get:
       summary: A trial

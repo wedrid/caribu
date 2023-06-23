@@ -5,7 +5,7 @@ info:
   description: API Gateway for managing requests
 
 paths:
-  /reqapi/clients:
+  /clients:
     get: 
       summary: Get all clients
       operationId: getAllClients

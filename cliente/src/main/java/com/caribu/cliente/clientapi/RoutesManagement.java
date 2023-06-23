@@ -18,10 +18,14 @@ import io.vertx.rxjava3.ext.web.handler.BodyHandler;
 import io.vertx.rxjava3.ext.web.openapi.RouterBuilder;
 import io.vertx.rxjava3.pgclient.PgPool;
 import io.vertx.rxjava3.sqlclient.Pool;
+import io.vertx.servicediscovery.ServiceDiscovery;
+import io.vertx.servicediscovery.types.HttpEndpoint;
 import io.vertx.sqlclient.PoolOptions;
 
 public class RoutesManagement extends AbstractVerticle{
     private static final Logger LOG = LoggerFactory.getLogger(RoutesManagement.class);
+    private ServiceDiscovery discovery;
+    private final int PORT = 10001;
 
     @Override
     public Completable rxStart(){
@@ -38,7 +42,7 @@ public class RoutesManagement extends AbstractVerticle{
     }
     
     private void startHttpServerAndAttachRoutes(final ClientConfig configuration){
-
+    discovery = ServiceDiscovery.create(vertx.getDelegate());
     final var poolOptions = new PoolOptions()
       .setMaxSize(4);
 
@@ -59,6 +63,7 @@ public class RoutesManagement extends AbstractVerticle{
           routerBuilder.operation("getAllClients").handler(new RxGetAllClientsHandler(db));
           routerBuilder.operation("addNewClient").handler(new RxAddNewClientHandler(db));
           routerBuilder.operation("createNewRequest").handler(new RxCreateNewRequestHandler(db));
+          routerBuilder.operation("getAllOpenRequests").handler(new RxGetAllOpenRequestsHandler(db));
 
           Router restApi = routerBuilder.createRouter();
 
@@ -66,9 +71,22 @@ public class RoutesManagement extends AbstractVerticle{
           restApi.route().handler(BodyHandler.create());
           Single<HttpServer> single = vertx.createHttpServer()
             .requestHandler(restApi)
-            .rxListen(10001,"localhost");
+            .rxListen(PORT,"localhost");
             single.subscribe(
-              server -> {LOG.info("Server Start");
+              server -> {
+                LOG.info("HTTP server started, attaching to discovery");
+                discovery.publish(
+                HttpEndpoint.createRecord("reqapi", "127.0.0.1", PORT, "/"),
+                ar -> {
+                  if (ar.succeeded()) {
+                    LOG.info("HTTP server started on port {}", PORT);
+                    LOG.info("Service published on port {}", PORT);
+                  } else {
+                    LOG.error("Error starting the discovery infrastructure");
+                    LOG.info("Error starting the discovery infrastructure");
+                  }
+                }
+                );
               },
               failure -> {LOG.error("Server could not start: (1) " + failure.getMessage(), failure);
               }

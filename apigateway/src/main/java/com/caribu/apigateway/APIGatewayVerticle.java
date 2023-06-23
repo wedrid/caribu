@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -19,6 +20,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.RequestOptions;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.spi.cluster.ClusterManager;
@@ -64,6 +66,53 @@ public class APIGatewayVerticle extends AbstractVerticle {
 
     RouterBuilder.create(this.vertx, "/Users/edrid/Desktop/SWAM/caribu/apigateway/src/main/resources/APIGateway.yaml") //TODO: change to relative path
       .onSuccess(routerBuilder -> {
+        /* 
+        routerBuilder
+          .operation("getAllClients")
+          .handler(
+            context -> {
+              String[] parts = context.normalizedPath().split("/", 3);
+              String ms_name = parts[1];
+              String endpoint_path = "/" + parts[2];
+              discovery.getRecord(new JsonObject().put("name", ms_name)).onComplete(ar -> {
+                if (ar.succeeded() && ar.result() != null) {
+                  // Retrieve the service reference
+                  ServiceReference reference = discovery.getReference(ar.result());
+                  String address = ar.result().getLocation().getString("host");
+                  int port = ar.result().getLocation().getInteger("port");
+                  LOG.info("Service found at " + address + ":" + port);
+                  
+                  WebClient client = reference.getAs(WebClient.class);
+                  //WebClient client = WebClient.create(vertx);
+
+                  client.request(context.request().method(), endpoint_path)
+                    .putHeaders(context.request().headers())
+                    .send()
+                    .onComplete(response -> {
+                      if (response.succeeded()) {
+                        LOG.info("The other verticle responds with: " + response.result().bodyAsString());
+                        context.response()
+                          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                          .end(response.result().bodyAsBuffer());
+                      } else {
+                        LOG.error("Request failed", response.cause());
+                      }
+                  });
+                    
+                  LOG.info("Found and retrieved service");
+                  reference.release();
+                } else {
+                  LOG.info("Not finding the service");
+                }
+              });
+            }
+          );*/
+        
+        routerBuilder
+            .operation("getAllClients")
+            .handler(new DispatchRequestHandler(discovery));
+          
+
         routerBuilder
             .operation("provaProxy")
             .handler(context -> {
@@ -189,14 +238,13 @@ public class APIGatewayVerticle extends AbstractVerticle {
           // see https://github.dev/vertx-howtos/web-and-openapi-howto @ line 93
 
           // create the HTTP server
-          server = vertx.createHttpServer(new HttpServerOptions().setPort(8888).setHost("localhost"));
+          server = vertx.createHttpServer(new HttpServerOptions().setPort(10000).setHost("localhost"));
           server.requestHandler(router).listen();
           startPromise.complete();
       })
       .onFailure(startPromise::fail);
       
   }
-    
 
   private Handler<RoutingContext> dispatchRequest() {
     return context -> {
