@@ -42,9 +42,14 @@ public class DispatchRequestHandler implements Handler<RoutingContext>{
                     .onComplete(response -> {
                       if (response.succeeded()) {
                         LOG.info("The other verticle responds with: " + response.result().bodyAsString());
+                        
+                        response.result().headers().forEach(header -> {
+                          context.response().putHeader(header.getKey(), header.getValue());
+                        });
                         context.response()
-                          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                          //.putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON) //TODO: put headers that get with the response
                           .end(response.result().bodyAsBuffer());
+                        
                       } else {
                         LOG.error("Request failed", response.cause());
                       }
