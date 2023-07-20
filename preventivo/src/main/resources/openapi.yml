@@ -1,0 +1,145 @@
+openapi: 3.0.1
+info:
+  title: Quotes API
+  version: 1.0.0
+servers:
+  - url: http://localhost
+    description: My server
+
+paths:
+  /quotesapi/quotes:
+    get:
+      summary: Get all quotes records
+      operationId: listQuotes
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Quotes'
+    post:
+      summary: Create a new quotes record
+      operationId: addQuotes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                $ref: '#/components/schemas/Quotes'
+      responses:
+        '200':
+          description: Quotes added successfully
+        '400':
+          description: Invalid input
+  /quotes/{id_quotes}:
+    get:
+      summary: Get a single quotes record by ID
+      operationId: getQuotes
+      parameters:
+        - name: id_quotes
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotes'
+    put:
+      summary: Update a quotes record by ID
+      operationId: updateQuotesById
+      parameters:
+        - name: id_quotes
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Quotes'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Quotes'
+    delete:
+      summary: Delete a quotes record by ID
+      operationId: deleteQuotes
+      parameters:
+        - name: id_quotes
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+  /quotes/newComm:
+    post:
+      summary: Add element in cache
+      operationId: addQuotesCache
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              items:
+                $ref: '#/components/schemas/Quotes'
+      responses:
+        '200':
+          description: Quotes added successfully
+        '400':
+          description: Invalid input        
+
+components:
+  schemas:
+    Quotes:
+      type: object
+      properties:
+        id_quotes:
+          type: string
+        operativo:
+          type: string
+        lunghezza:
+          type: integer
+        larghezza:
+          type: integer
+        profondità:
+          type: integer
+        id_fornitore:
+          type: string
+        id_tratta:
+          type: string
+        costo:
+          type: integer
+        origin_geom:
+          type: string
+          description: Location in geography(POINT, 4326) format
+        destination_geom:
+          type: string
+          description: Location in geography(POINT, 4326) format
+      required:
+        - id_quotes
+        - operativo
+        - lunghezza
+        - larghezza
+        - profondità
+        - id_fornitore
+        - id_tratta
+        - costo
+        - origin_geom
+        - destination_geom
