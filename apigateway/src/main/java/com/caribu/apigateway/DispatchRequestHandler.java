@@ -29,6 +29,7 @@ public class DispatchRequestHandler implements Handler<RoutingContext>{
                 if (ar.succeeded() && ar.result() != null) {
                   // Retrieve the service reference
                   ServiceReference reference = discovery.getReference(ar.result());
+                  LOG.info("Found and retrieved service");
                   String address = ar.result().getLocation().getString("host");
                   int port = ar.result().getLocation().getInteger("port");
                   LOG.info("Service found at " + address + ":" + port);
@@ -42,19 +43,17 @@ public class DispatchRequestHandler implements Handler<RoutingContext>{
                     .onComplete(response -> {
                       if (response.succeeded()) {
                         LOG.info("The other verticle responds with: " + response.result().bodyAsString());
-                        
                         response.result().headers().forEach(header -> {
                           context.response().putHeader(header.getKey(), header.getValue());
                         });
                         context.response()
                           //.putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON) //TODO: put headers that get with the response
                           .end(response.result().bodyAsBuffer());
-                        
                       } else {
                         LOG.error("Request failed", response.cause());
                       }
                   }); 
-                  LOG.info("Found and retrieved service");
+                  
                   reference.release();
                 } else {
                   LOG.info("Not finding the service");

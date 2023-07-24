@@ -1,15 +1,25 @@
 package com.caribu.prova_auth;
 
+import java.text.ParseException;
+import java.util.List;
 import java.util.Set;
+import com.nimbusds.jwt.JWT;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.JWTParser;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.auth.JWTOptions;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.authorization.AuthorizationProvider;
 import io.vertx.ext.auth.authorization.Authorizations;
 import io.vertx.ext.auth.authorization.PermissionBasedAuthorization;
 import io.vertx.ext.auth.authorization.RoleBasedAuthorization;
+import io.vertx.ext.auth.jwt.JWTAuth;
+import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.auth.oauth2.OAuth2Auth;
 import io.vertx.ext.auth.oauth2.OAuth2Options;
 import io.vertx.ext.auth.oauth2.authorization.KeycloakAuthorization;
@@ -60,15 +70,26 @@ public class MainVerticle extends AbstractVerticle {
             // Additional scopes: openid for OpenID Connect, tells the Authorization server that we are doing OIDC and not OAuth
             .withScope("openid")
             .setupCallback(callbackRoute);
+
             
-          AuthorizationProvider authorizationProvider = KeycloakAuthorization.create();
-          AuthorizationHandler operationalRoleHandler = AuthorizationHandler.create(RoleBasedAuthorization.create("operational"))
-              .addAuthorizationProvider(authorizationProvider);
+          
           router.route("/hello/*").handler(oauth2handler);
-          router.route("/hello/*").handler(operationalRoleHandler);
-          router.route("/hello/world").handler(context -> {
-            var user = context.user();
-            context.response().end(user.principal().encodePrettily());
+          router.route("/hello/world").handler(
+            context -> {
+              User user = context.user();
+              System.out.println(user.principal().encodePrettily());
+
+              
+              KeycloakAuthorization.create().getAuthorizations(user)
+                .onSuccess(v -> {
+                  // At this point the user object should have the authorizations filled in.
+                  // We can now use an AuthorizationHandler to protect resources:
+                  AuthorizationHandler.create(RoleBasedAuthorization.create("operational"))
+                    .handle(context);
+                })
+                .onFailure(context::fail); 
+            /*var user = context.user();
+            context.response().end(user.principal().encodePrettily()); */
           });
               
           router.route("/logout").handler(this::handleLogout);
