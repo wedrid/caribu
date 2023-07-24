@@ -1,6 +1,6 @@
-= Filiale
+= Preventivo
 
-image:https://img.shields.io/badge/vert.x-4.4.1-purple.svg[link="https://vertx.io"]
+image:https://img.shields.io/badge/vert.x-4.4.4-purple.svg[link="https://vertx.io"]
 
 This application was generated using http://start.vertx.io
 
@@ -21,11 +21,6 @@ To run your application:
 ./mvnw clean compile exec:java
 ```
 
-Docker
-```
-docker run --name my-postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=vertx_quotes -p 5432:5432 -e POSTGRES_INITDB_ARGS="--auth="md5"" -d postgis/postgis:15-3.3-alpine
-```
-docker pull postgis/postgis:15-3.3-alpine
 == Help
 
 * https://vertx.io/docs/[Vert.x Documentation]
@@ -35,4 +30,3 @@ docker pull postgis/postgis:15-3.3-alpine
 * https://gitter.im/eclipse-vertx/vertx-users[Vert.x Gitter]
 
 
-location geography(POINT, 4326)

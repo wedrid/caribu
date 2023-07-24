@@ -6,7 +6,7 @@
     </encoder>
   </appender>
 
-  <logger name="com.caribu.filiale" level="debug"/>
+  <logger name="com.caribu.preventivo" level="debug"/>
   <logger name="io.netty" level="warn"/>
   <logger name="io.vertx" level="info"/>
   <logger name="org.flywaydb.core" level="info"/>
