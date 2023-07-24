@@ -4,6 +4,12 @@ info:
   version: 1.0.0
   description: API Gateway for managing requests
 
+components:
+ securitySchemes:
+   oauth:   # <--- Arbitrary name for the security scheme. Used to refer to it from elsewhere.
+     type: openIdConnect
+     openIdConnectUrl: http://localhost:8989/realms/vertx-dev
+
 paths:
   /ping:
     get: 

@@ -66,13 +66,10 @@ public class MainVerticle extends AbstractVerticle {
         this.oAuth2Auth = oAuth2Auth;
         try {
           Route callbackRoute = router.get(CALLBACK_URI);
-          OAuth2AuthHandler oauth2handler = OAuth2AuthHandler.create(vertx, oAuth2Auth, HOST + CALLBACK_URI)
-            // Additional scopes: openid for OpenID Connect, tells the Authorization server that we are doing OIDC and not OAuth
+          OAuth2AuthHandler oauth2handler = OAuth2AuthHandler.create(vertx, oAuth2Auth, HOST + CALLBACK_URI) // Additional scopes: openid for OpenID Connect, tells the Authorization server that we are doing OIDC and not OAuth
             .withScope("openid")
             .setupCallback(callbackRoute);
 
-            
-          
           router.route("/hello/*").handler(oauth2handler);
           router.route("/hello/world").handler(
             context -> {
