@@ -51,7 +51,7 @@ import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.servicediscovery.ServiceReference;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
-public class APIGatewayVerticle extends AbstractVerticle {
+public class APIGatewayVerticle_copy extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(APIGatewayVerticle.class);
 
   //protected ServiceDiscovery discovery;
@@ -85,50 +85,105 @@ public class APIGatewayVerticle extends AbstractVerticle {
     requestProxy = HttpProxy.reverseProxy(httpClient);
 
     discovery = ServiceDiscovery.create(vertx);
-    Router securityRouter = Router.router(vertx);
-
-    //for authentication
-    LocalSessionStore localSessionStore = LocalSessionStore.create(vertx);
-    SessionHandler sessionHandler = SessionHandler.create(localSessionStore);
-    securityRouter.route().handler(LoggerHandler.create(LoggerFormat.SHORT));
-    securityRouter.route().handler(BodyHandler.create());
-    securityRouter.route().handler(sessionHandler);
-    OAuth2Options clientOptions = new OAuth2Options()
-      .setClientId("vertx-dev-client")
-      .setClientSecret("MLW2U31o1zsh0OF13aclRjzJEkXuUoEU")
-      .setSite("http://localhost:8989/realms/vertx-dev");
-    KeycloakAuth.discover(
-      vertx,
-      clientOptions)
-      .onSuccess(oAuth2Auth -> {
-            
-      System.out.println("Keycloak discovery complete.");
-      this.oAuth2Auth = oAuth2Auth;
-      try {
-        Route callbackRoute = securityRouter.get(CALLBACK_URI);
-        OAuth2AuthHandler oauth2handler = OAuth2AuthHandler.create(vertx, oAuth2Auth, HOST + CALLBACK_URI)
-          // Additional scopes: openid for OpenID Connect, tells the Authorization server that we are doing OIDC and not OAuth
-          .withScope("openid")
-          .setupCallback(callbackRoute);
-
-        //securityRouter.route("/hello/*").handler(oauth2handler);
-            
-        securityRouter.route("/logout").handler(this::handleLogout);
-        //router.route("/private/*").handler(oauth2handler);
-        securityRouter.route("/*").handler(oauth2handler);
-        securityRouter.route("/private/account").handler(routingContext -> {
-          System.out.println(routingContext.user().principal().encodePrettily());
-          routingContext.response()
-            .setStatusCode(200)
-            .putHeader("Content-Type", "application/json")
-            .end(routingContext.user().attributes().encodePrettily());
-        });
-        } catch (Exception e) {
-        e.printStackTrace();
-      }
+    Router securitySubRouter = Router.router(vertx);
 
     RouterBuilder.create(this.vertx, "/Users/edrid/Desktop/SWAM/caribu/apigateway/src/main/resources/APIGateway.yaml") //TODO: change to relative path
       .onSuccess(routerBuilder -> {
+        //authentication handler for openAPI
+        /*routerBuilder
+          .securityHandler("openId")
+          .bind(config ->
+
+
+            OpenIDConnectAuth
+              .discover(vertx, new OAuth2Options()
+                .setClientId("client-id") // user provided
+                .setClientSecret("client-secret") // user provided
+                .setSite(config.getString("openIdConnectUrl")))
+              .compose(authProvider -> {
+                AuthenticationHandler handler =
+                  OAuth2AuthHandler.create(vertx, authProvider);
+                return Future.succeededFuture(handler);
+              }))
+          .onSuccess(self -> {
+            // Creation completed with success
+          })
+          .onFailure(err -> {
+            // Something went wrong
+          });*/
+
+          /*  this should be the good way to use openapi and security
+          OAuth2Options clientOptions = new OAuth2Options()
+            .setClientId("vertx-dev-client")
+            .setClientSecret("MLW2U31o1zsh0OF13aclRjzJEkXuUoEU")
+            .setSite("http://localhost:8989/realms/vertx-dev");
+          Router router1 = Router.router(vertx);
+          Route callbackRoute = router1.get(CALLBACK_URI);
+          routerBuilder
+            .securityHandler("oauth")
+            .bind(config -> KeycloakAuth.discover(vertx, clientOptions)
+              .compose(oidc -> Future.succeededFuture(
+                OAuth2AuthHandler.create(vertx, oidc, HOST + CALLBACK_URI) // Additional scopes: openid for OpenID Connect, tells the Authorization server that we are doing OIDC and not OAuth
+                  .withScope("openid")
+                  .setupCallback(callbackRoute)
+                )))
+            .onSuccess(self -> {
+              self
+                .operation("ping")
+                .handler(context -> {
+                  LOG.info("Called ping :)");
+                  context
+                    .response()
+                    .setStatusCode(200)
+                    .putHeader(HttpHeaders.CONTENT_TYPE, "application/json") 
+                    .end(new JsonArray(pets).encode()); 
+                });
+            });*/
+
+        /*
+        routerBuilder
+          .operation("getAllClients")
+          .handler(
+            context -> {
+              String[] parts = context.normalizedPath().split("/", 3);
+              String ms_name = parts[1];
+              String endpoint_path = "/" + parts[2];
+              discovery.getRecord(new JsonObject().put("name", ms_name)).onComplete(ar -> {
+                if (ar.succeeded() && ar.result() != null) {
+                  // Retrieve the service reference
+                  ServiceReference reference = discovery.getReference(ar.result());
+                  String address = ar.result().getLocation().getString("host");
+                  int port = ar.result().getLocation().getInteger("port");
+                  LOG.info("Service found at " + address + ":" + port);
+                  
+                  WebClient client = reference.getAs(WebClient.class);
+                  //WebClient client = WebClient.create(vertx);
+
+                  client.request(context.request().method(), endpoint_path)
+                    .putHeaders(context.request().headers())
+                    .send()
+                    .onComplete(response -> {
+                      if (response.succeeded()) {
+                        LOG.info("The other verticle responds with: " + response.result().bodyAsString());
+                        context.response()
+                          .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                          .end(response.result().bodyAsBuffer());
+                      } else {
+                        LOG.error("Request failed", response.cause());
+                      }
+                  });
+                    
+                  LOG.info("Found and retrieved service");
+                  reference.release();
+                } else {
+                  LOG.info("Not finding the service");
+                }
+              });
+            }
+          );*/
+        
+        
+        
         routerBuilder
             .operation("getAllClients")
             .handler(new DispatchRequestHandler(discovery));
@@ -152,7 +207,7 @@ public class APIGatewayVerticle extends AbstractVerticle {
               });
             });
             //PING
-        routerBuilder
+        /*routerBuilder
           .operation("ping")
           .handler(context -> {
             LOG.info("Called ping :)");
@@ -161,7 +216,7 @@ public class APIGatewayVerticle extends AbstractVerticle {
               .setStatusCode(200)
               .putHeader(HttpHeaders.CONTENT_TYPE, "application/json") 
               .end(new JsonArray(pets).encode()); 
-          });
+          });*/
           routerBuilder
             .operation("getAllRequests")
             .handler(context -> {
@@ -247,23 +302,91 @@ public class APIGatewayVerticle extends AbstractVerticle {
               }
             });
             });
-          
+          // the other operations here
+          //...
 
 
           // generate the router
-          Router superRouter = Router.router(vertx); 
-          Router functionalRouter = routerBuilder.createRouter();
-          superRouter.route("/*").subRouter(securityRouter);
-          superRouter.route("/*").subRouter(functionalRouter);
-          
+          Router router = routerBuilder.createRouter();
+          /* 
+          //for authentication
+          LocalSessionStore localSessionStore = LocalSessionStore.create(vertx);
+          SessionHandler sessionHandler = SessionHandler.create(localSessionStore);
+          router.route().handler(LoggerHandler.create(LoggerFormat.SHORT));
+          router.route().handler(BodyHandler.create());
+          router.route().handler(sessionHandler);
+          OAuth2Options clientOptions = new OAuth2Options()
+            .setClientId("vertx-dev-client")
+            .setClientSecret("MLW2U31o1zsh0OF13aclRjzJEkXuUoEU")
+            .setSite("http://localhost:8989/realms/vertx-dev");
+          KeycloakAuth.discover(
+            vertx,
+            clientOptions)
+            .onSuccess(oAuth2Auth -> {
+                  
+            System.out.println("Keycloak discovery complete.");
+            this.oAuth2Auth = oAuth2Auth;
+            try {
+              Route callbackRoute = router.get(CALLBACK_URI);
+              OAuth2AuthHandler oauth2handler = OAuth2AuthHandler.create(vertx, oAuth2Auth, HOST + CALLBACK_URI)
+                // Additional scopes: openid for OpenID Connect, tells the Authorization server that we are doing OIDC and not OAuth
+                .withScope("openid")
+                .setupCallback(callbackRoute);
+
+              router.route("/hello/*").handler(oauth2handler);
+              router.route("/hello/world").handler(
+                context -> {
+                  User user = context.user();
+                  System.out.println(user.principal().encodePrettily());
+
+                  
+                  KeycloakAuthorization.create().getAuthorizations(user)
+                    .onSuccess(v -> {
+                      // At this point the user object should have the authorizations filled in.
+                      // We can now use an AuthorizationHandler to protect resources:
+                      AuthorizationHandler.create(RoleBasedAuthorization.create("operational"))
+                        .handle(context);
+                    })
+                    .onFailure(context::fail); 
+                /*var user = context.user();
+                context.response().end(user.principal().encodePrettily()); //ex fine
+              });
+                  
+              //router.route("/logout").handler(this::handleLogout);
+              //router.route("/private/*").handler(oauth2handler);
+              router.route("/*").handler(oauth2handler);
+              router.route("/private/account").handler(routingContext -> {
+                System.out.println(routingContext.user().principal().encodePrettily());
+                routingContext.response()
+                  .setStatusCode(200)
+                  .putHeader("Content-Type", "application/json")
+                  .end(routingContext.user().attributes().encodePrettily());
+              });
+              
+              
+              router.get().handler(StaticHandler.create("www"));
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+            */
+
+            /*vertx.createHttpServer().requestHandler(router).listen(8888, http -> {
+              if (http.succeeded()) {
+                startPromise.complete();
+                System.out.println("HTTP server started on port 8888");
+              } else {
+                startPromise.fail(http.cause());
+              }
+            });
+                  
+            } );*/
 
             // create the HTTP server
-            server = vertx.createHttpServer(new HttpServerOptions().setPort(8888).setHost("localhost"));
-            server.requestHandler(superRouter).listen();
+            server = vertx.createHttpServer(new HttpServerOptions().setPort(10000).setHost("localhost"));
+            server.requestHandler(router).listen();
             startPromise.complete();
       })
       .onFailure(startPromise::fail);
-    });
       
   }
 
