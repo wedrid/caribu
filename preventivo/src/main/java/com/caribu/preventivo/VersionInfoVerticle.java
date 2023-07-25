@@ -17,7 +17,7 @@ public class VersionInfoVerticle extends AbstractVerticle {
   @Override
   public Completable rxStart() {
       return ConfigLoader.load(vertx)
-        .doOnSuccess(configuration -> LOG.info("CIAOOOOOOCurrent Application Version is: {}", configuration.getVersion()))
+        .doOnSuccess(configuration -> LOG.info("Current Application Version is: {}", configuration.getVersion()))
         .doOnError(throwable -> LOG.error("Failed to load configuration", throwable))
          .ignoreElement();
     }

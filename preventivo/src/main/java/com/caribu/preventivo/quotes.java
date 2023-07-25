@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class quotes {
+public class quotes {//metto maiuscolo
     
  String id_quotes;
  String id_commission;

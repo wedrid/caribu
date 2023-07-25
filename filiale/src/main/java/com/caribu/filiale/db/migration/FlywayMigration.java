@@ -43,8 +43,8 @@ public class FlywayMigration {
 
     final Flyway flyway = Flyway.configure()
       .dataSource(jdbcUrl, dbConfig.getUser(), dbConfig.getPassword())
-      .schemas("broker")
-      .defaultSchema("broker")
+      .schemas("schemaF")
+      .defaultSchema("schemaF")
       .load();
 
     var current = Optional.ofNullable(flyway.info().current());

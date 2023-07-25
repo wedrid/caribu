@@ -7,7 +7,7 @@ servers:
     description: My server
 
 paths:
-  /op/add:
+  /companyapi/operator:
     post:
       summary: Add a new operator
       operationId: AddOp
@@ -16,26 +16,25 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Operator'
+              $ref: "#/components/schemas/Operator"
       responses:
-        '200':
+        "200":
           description: Operator added successfully
-        '400':
+        "400":
           description: Invalid input
-  /company/operator:
     get:
       summary: Get all operators
       operationId: listOp
       responses:
-        '200':
+        "200":
           description: List of all operators
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Operator'
-  /op/{id}:
+                  $ref: "#/components/schemas/Operator"
+  /companyapi/operator/{id}:
     get:
       summary: Get operator by ID
       operationId: getOp
@@ -47,14 +46,12 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        "200":
           description: Operator found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Operator' 
-
-  /op/update/{id}:
+                $ref: "#/components/schemas/Operator"
     put:
       summary: Update operator availability
       operationId: updateOpAvailability
@@ -73,11 +70,10 @@ paths:
                 isavaible:
                   type: boolean
       responses:
-        '204':
+        "204":
           description: Operator updated
-        '400':
+        "400":
           description: Invalid input
-  /op/delete/{id}:
     delete:
       summary: Delete operator by ID
       operationId: deleteOp
@@ -89,9 +85,9 @@ paths:
             format: int64
           required: true
       responses:
-        '204':
+        "204":
           description: Operator deleted
-        '404':
+        "404":
           description: Operator not found
 components:
   schemas:
