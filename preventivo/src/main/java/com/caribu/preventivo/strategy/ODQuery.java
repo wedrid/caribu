@@ -14,7 +14,8 @@ public class ODQuery implements StrategyQuery {
 		String query_string = "SELECT *, ST_DistanceSphere(o.origin_geom, o.destination_geom) as dist, ST_DistanceSphere("
 				+ input_Ogeo + ", " + input_Dgeo
 				+ ") as dist_in from schema.quotes o where ST_DistanceSphere(o.origin_geom, " + input_Ogeo
-				+ ") <20000 AND ST_DistanceSphere(o.destination_geom, " + input_Dgeo + ") <20000";
+				+ ") <#{soglia} AND ST_DistanceSphere(o.destination_geom, " + input_Dgeo + ") <#{soglia}";
+
 		return query_string;
 	}
 }
