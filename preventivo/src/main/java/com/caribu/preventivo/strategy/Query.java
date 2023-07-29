@@ -33,8 +33,8 @@ public class Query {
     this.format = format;
   }
 
-  public String getQuery(Query query) {
-    return format.createQuery(query);
+  public String getQuery(Query query, String table) {
+    return format.createQuery(query, table);
   }
 
   public String getCost() {

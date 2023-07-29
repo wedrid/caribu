@@ -1,14 +1,9 @@
 package com.caribu.preventivo.strategy;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.vertx.rxjava3.ext.web.RoutingContext;
-
 /* ConcreteStrategy */
 public class DistanceQuery implements StrategyQuery {
     @Override
-	public String createQuery(Query query){
+	public String createQuery(Query query, String table){
                 // FIRENZE -> ROMA
                 // oLat=43.7792500&oLon=11.2462600&dLat=41.8919300&dLon=12.5113300
                 // FIRENZE->PISA

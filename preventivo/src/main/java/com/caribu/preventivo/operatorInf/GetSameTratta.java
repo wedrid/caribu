@@ -42,6 +42,8 @@ public class GetSameTratta implements Handler<RoutingContext> {
         Map<String, Object> parameters = new HashMap<>();
         Query query = new Query(); // Strategy
 
+        String table = "boh";
+
         Float select = convertParameters(context, "select", 0f); // Strategy
         getParameters(context, parameters, query);
 
@@ -50,19 +52,19 @@ public class GetSameTratta implements Handler<RoutingContext> {
             LOG.info("Executing DB query to find all quotes");
             // Strategy
             query.setQuery(new GenericQuery());
-            string_query = query.getQuery(query);
+            string_query = query.getQuery(query, table);
             LOG.info("Query: {}", string_query);
 
         } else if (select == 1) { // Qualsiasi O-D con simile distanza -> soglia
             // Strategy
             query.setQuery(new DistanceQuery());
-            string_query = query.getQuery(query) + " AND" + query.getCost();
+            string_query = query.getQuery(query, table) + " AND" + query.getCost();
             LOG.info("Query: {}", string_query);
 
         } else if (select == 2) { // Intorno O e D -> raggio
             // Strategy
             query.setQuery(new ODQuery());
-            string_query = query.getQuery(query) + " AND" + query.getCost();
+            string_query = query.getQuery(query, table) + " AND" + query.getCost();
             LOG.info("Query: {}", string_query);
 
         }
