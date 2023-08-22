@@ -4,8 +4,6 @@ package com.caribu.preventivo.config;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.sound.sampled.AudioFileFormat.Type;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,33 +27,32 @@ public class ConfigLoader {
   public static final String DB_USER = "DB_USER";
   public static final String DB_PASSWORD = "DB_PASSWORD";
   static final List<String> EXPOSED_ENVIRONMENT_VARIABLES = Arrays.asList(SERVER_PORT,
-    DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD);
+      DB_HOST, DB_PORT, DB_DATABASE, DB_USER, DB_PASSWORD);
 
-  public static Single<BrokerConfig> load(Vertx vertx) {
+  public static Single<QuotesConfig> load(Vertx vertx) {
     final var exposedKeys = new JsonArray();
     EXPOSED_ENVIRONMENT_VARIABLES.forEach(exposedKeys::add);
     LOG.debug("Fetch configuration for {}", exposedKeys.encode());
 
     var envStore = new ConfigStoreOptions()
-      .setType("env")
-      .setConfig(new JsonObject().put("keys", exposedKeys));
+        .setType("env")
+        .setConfig(new JsonObject().put("keys", exposedKeys));
 
     var propertyStore = new ConfigStoreOptions()
-      .setType("sys")
-      .setConfig(new JsonObject().put("cache", false));
+        .setType("sys")
+        .setConfig(new JsonObject().put("cache", false));
 
     var yamlStore = new ConfigStoreOptions()
-      .setType("file")
-      .setFormat("yaml")
-      .setConfig(new JsonObject().put("path", CONFIG_FILE));
+        .setType("file")
+        .setFormat("yaml")
+        .setConfig(new JsonObject().put("path", CONFIG_FILE));
 
     var retriever = ConfigRetriever.create(vertx,
-      new ConfigRetrieverOptions()
-        // Order defines overload rules
-        .addStore(yamlStore)
-        .addStore(propertyStore)
-        .addStore(envStore)
-    );
-    return retriever.getConfig().map(BrokerConfig::from); 
+        new ConfigRetrieverOptions()
+            // Order defines overload rules
+            .addStore(yamlStore)
+            .addStore(propertyStore)
+            .addStore(envStore));
+    return retriever.getConfig().map(QuotesConfig::from);
   }
 }

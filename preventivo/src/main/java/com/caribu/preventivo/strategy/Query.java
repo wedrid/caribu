@@ -1,4 +1,5 @@
 package com.caribu.preventivo.strategy;
+
 import com.caribu.preventivo.strategy.StrategyQuery;
 
 import io.vertx.core.json.JsonObject;
@@ -10,37 +11,35 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Query {
-    
-    String id_quotes;
-    String id_commission;
 
-    private Float oLat;
-    private Float oLon;
-    private Float dLat;
-    private Float dLon;
-    private Integer maxCost = 1000000;
-    private Integer minCost = 0;
-    private StrategyQuery format;
+  String id_quotes;
+  String id_commission;
 
-    public JsonObject toJsonObject() {
-        return JsonObject.mapFrom(this);
-      }
-      
-    public void setQuery(StrategyQuery format) {
-      this.format = format;
-    }
-    public String getQuery(Query query) {
-      return format.createQuery(query);
-    }
+  private Float oLat;
+  private Float oLon;
+  private Float dLat;
+  private Float dLon;
 
-    public void setCost(int maxCost, int minCost) {
-      this.maxCost = maxCost;
-      this.minCost = minCost;
-    }
+  private Float soglia;
+  private Float maxCost;
+  private Float minCost;
+  private StrategyQuery format;
 
-    public String getCost() {
-      String stringCost = "AND o.cost BETWEEN " + minCost +" AND " + maxCost;
-      return stringCost;
-    }
-  
+  public JsonObject toJsonObject() {
+    return JsonObject.mapFrom(this);
+  }
+
+  public void setQuery(StrategyQuery format) {
+    this.format = format;
+  }
+
+  public String getQuery(Query query, String table) {
+    return format.createQuery(query, table);
+  }
+
+  public String getCost() {
+    String stringCost = " o.costo BETWEEN " + minCost + " AND " + maxCost;
+    return stringCost;
+  }
+
 }

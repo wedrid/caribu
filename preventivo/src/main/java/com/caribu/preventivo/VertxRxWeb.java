@@ -18,9 +18,8 @@ import io.vertx.sqlclient.PoolOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.caribu.preventivo.config.BrokerConfig;
+import com.caribu.preventivo.config.QuotesConfig;
 import com.caribu.preventivo.config.ConfigLoader;
-import com.caribu.preventivo.eliminare.GetAllOpFromDatabaseHandler;
 import com.caribu.preventivo.operatorInf.AddQuotesCache;
 import com.caribu.preventivo.operatorInf.DeleteOpDatabaseHandler;
 import com.caribu.preventivo.operatorInf.GetOpFromDatabaseHandler;
@@ -34,30 +33,29 @@ public class VertxRxWeb extends AbstractVerticle {
 
   @Override
   public Completable rxStart() {
-      return ConfigLoader.load(vertx)
-      .doOnSuccess(configuration -> {
-        LOG.info("Retrieved Configuration: {}", configuration);
+    return ConfigLoader.load(vertx)
+        .doOnSuccess(configuration -> {
+          LOG.info("Retrieved Configuration: {}", configuration);
 
-        startHttpServerAndAttachRoutes(configuration);
-      })
-      .doOnError(configuration -> {
-        LOG.info("Errore: {}", configuration);
-      })
-      .ignoreElement();
+          startHttpServerAndAttachRoutes(configuration);
+        })
+        .doOnError(configuration -> {
+          LOG.info("Errore: {}", configuration);
+        })
+        .ignoreElement();
   }
 
-  
-  private void startHttpServerAndAttachRoutes(final BrokerConfig configuration){
+  private void startHttpServerAndAttachRoutes(final QuotesConfig configuration) {
 
     final var poolOptions = new PoolOptions()
-      .setMaxSize(4);
+        .setMaxSize(4);
 
     final var connectOptions = new PgConnectOptions()
-      .setHost(configuration.getDbConfig().getHost())
-      .setPort(configuration.getDbConfig().getPort())
-      .setDatabase(configuration.getDbConfig().getDatabase())
-      .setUser(configuration.getDbConfig().getUser())
-      .setPassword(configuration.getDbConfig().getPassword());
+        .setHost(configuration.getDbConfig().getHost())
+        .setPort(configuration.getDbConfig().getPort())
+        .setDatabase(configuration.getDbConfig().getDatabase())
+        .setUser(configuration.getDbConfig().getUser())
+        .setPassword(configuration.getDbConfig().getPassword());
     LOG.debug("DB Config: {}", connectOptions.getHost());
 
     final Pool db = PgPool.pool(vertx, connectOptions, poolOptions);
@@ -65,58 +63,58 @@ public class VertxRxWeb extends AbstractVerticle {
     RouterBuilder.create(vertx, "openapi.yml")
         .doOnSuccess(routerBuilder -> { // (1)
 
-        //routerBuilder.operation("listQuotes").handler(new GetAllOpFromDatabaseHandler(db)); // (3)
-        routerBuilder.operation("listQuotes").handler(new GetSameTratta(db)); // (3)
-        routerBuilder.operation("getQuotes").handler(new GetOpFromDatabaseHandler(db)); // (3)
-        //routerBuilder.operation("updateOpAvailability").handler(new PutOpDatabaseHandler(db)); // (3)
-        routerBuilder.operation("deleteQuotes").handler(new DeleteOpDatabaseHandler(db)); // (3)
-        routerBuilder.operation("addQuotes").handler(new PostOpFromDatabaseHandler(db)); // (3)
-        routerBuilder.operation("addQuotesCache").handler(new AddQuotesCache(db)); // (3)
+          routerBuilder.operation("listQuotes").handler(new GetSameTratta(db)); // (3)
+          routerBuilder.operation("getQuotes").handler(new GetOpFromDatabaseHandler(db)); // (3)
+          // routerBuilder.operation("updateOpAvailability").handler(new
+          // PutOpDatabaseHandler(db)); // (3)
+          routerBuilder.operation("deleteQuotes").handler(new DeleteOpDatabaseHandler(db)); // (3)
+          routerBuilder.operation("addQuotes").handler(new PostOpFromDatabaseHandler(db)); // (3)
+          routerBuilder.operation("addQuotesCache").handler(new AddQuotesCache(db)); // (3)
 
-        Router restApi = routerBuilder.createRouter();
-        restApi.route().handler(BodyHandler.create());
-      
-        restApi.route().handler(this::failureHandler);
+          Router restApi = routerBuilder.createRouter();
+          restApi.route().handler(BodyHandler.create());
 
-        Single<HttpServer> single = vertx.createHttpServer()
-          .requestHandler(restApi)
-          .rxListen(8888,"localhost");
+          restApi.route().handler(this::failureHandler);
+
+          Single<HttpServer> single = vertx.createHttpServer()
+              .requestHandler(restApi)
+              .rxListen(8888, "localhost");
           single.subscribe(
-            server -> {LOG.info("Server Start");
-            },
-            failure -> {LOG.error("Server could not start: (1) " + failure.getMessage(), failure);
-            }
-          );       
-      }).doOnError(cause -> { 
-            LOG.error("Server could not start: (2)" + cause.getMessage(), cause);
-    }).subscribe();
+              server -> {
+                LOG.info("Server Start");
+              },
+              failure -> {
+                LOG.error("Server could not start: (1) " + failure.getMessage(), failure);
+              });
+        }).doOnError(cause -> {
+          LOG.error("Server could not start: (2)" + cause.getMessage(), cause);
+        }).subscribe();
   }
 
   private void failureHandler(RoutingContext errorContext) {
-        
-        if (errorContext.response().ended()) {
-          // Ignore completed response
-          LOG.info("------");
-          return;
-        }
-        LOG.info("Route Error:", errorContext.failure());
-        errorContext.response()
-          .setStatusCode(500)
-          .end(new JsonObject().put("message: Something went wrong, path: ", errorContext.normalizedPath()).toString());
+
+    if (errorContext.response().ended()) {
+      // Ignore completed response
+      LOG.info("------");
+      return;
     }
+    LOG.info("Route Error:", errorContext.failure());
+    errorContext.response()
+        .setStatusCode(500)
+        .end(new JsonObject().put("message: Something went wrong, path: ", errorContext.normalizedPath()).toString());
+  }
+
   public static String getAccountId(final RoutingContext context) {
-        String id =  context.pathParam("id");//Integer.parseInt();
-        LOG.debug("{} for account {}", context.normalizedPath(), id);
-        return id;
+    String id = context.pathParam("id");// Integer.parseInt();
+    LOG.debug("{} for account {}", context.normalizedPath(), id);
+    return id;
   }
 
 }
 
-
-
-
-        //Router router = Router.router(vertx);
-        //router.route().handler(BodyHandler.create());
-        // router.get("/quotes").handler(new GetAllOpFromDatabaseHandler(db));//this::hello);//
-        // router.get("/quotes/delete/:id").handler(new GetAllOpFromDatabaseHandler(db));//this::hello);//
-
+// Router router = Router.router(vertx);
+// router.route().handler(BodyHandler.create());
+// router.get("/quotes").handler(new
+// GetAllOpFromDatabaseHandler(db));//this::hello);//
+// router.get("/quotes/delete/:id").handler(new
+// GetAllOpFromDatabaseHandler(db));//this::hello);//

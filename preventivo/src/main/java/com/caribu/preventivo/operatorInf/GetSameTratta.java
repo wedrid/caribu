@@ -12,7 +12,6 @@ import com.caribu.preventivo.strategy.GenericQuery;
 import com.caribu.preventivo.strategy.ODQuery;
 import com.caribu.preventivo.strategy.Query;
 import com.caribu.preventivo.VertxRxWeb;
-import com.caribu.preventivo.quotes;
 import com.caribu.preventivo.db.DbResponse;
 
 import io.netty.handler.codec.http.HttpHeaderValues;
@@ -22,195 +21,126 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.rxjava3.ext.web.RoutingContext;
 import io.vertx.rxjava3.sqlclient.Pool;
+import io.vertx.rxjava3.sqlclient.Row;
 import io.vertx.rxjava3.sqlclient.templates.SqlTemplate;
+import java.text.DecimalFormat;
 
 public class GetSameTratta implements Handler<RoutingContext> {
-
+    DecimalFormat df = new DecimalFormat("#.###");
     private static final Logger LOG = LoggerFactory.getLogger(GetSameTratta.class);
     private final Pool db;
     private String string_query;
+
     public GetSameTratta(final Pool db) {
         this.db = db;
     }
 
+    // http://localhost:8888/quoteapi/quotes?select=1&oLat=43.7696&oLon=11.2558&dLat=44.6983&dLon=10.6312&cmin=10&cmax=1000&soglia=200000
     @Override
     public void handle(final RoutingContext context) {
         // in input ho origine=(LAT, LONG), destinazione=(LAT, LONG)
-             
-        Query query = new Query();  // Strategy
+        Map<String, Object> parameters = new HashMap<>();
+        Query query = new Query(); // Strategy
 
-        String oLatS = context.request().getParam("oLat");
-        String oLonS = context.request().getParam("oLon");
-        String dLatS =  context.request().getParam("dLat");
-        String dLonS = context.request().getParam("dLon");
-        String costS = context.request().getParam("cost");
+        String table = "boh";
 
-        String sogliaDist = context.request().getParam("sogliaDist");
-        
-        if((oLatS == null || oLonS == null || dLatS == null || dLonS == null)){
+        Float select = convertParameters(context, "select", 0f); // Strategy
+        getParameters(context, parameters, query);
+
+        if (select != 1 && select != 2) {
             // Get all tratta_ query con nessun filtro
-            LOG.info("Executing DB query to find all quotes...");
-
-            //Strategy
+            LOG.info("Executing DB query to find all quotes");
+            // Strategy
             query.setQuery(new GenericQuery());
-            string_query = query.getQuery(query);
+            string_query = query.getQuery(query, table);
             LOG.info("Query: {}", string_query);
 
-            sqlTemplate(context, string_query, null);
+        } else if (select == 1) { // Qualsiasi O-D con simile distanza -> soglia
+            // Strategy
+            query.setQuery(new DistanceQuery());
+            string_query = query.getQuery(query, table) + " AND" + query.getCost();
+            LOG.info("Query: {}", string_query);
+
+        } else if (select == 2) { // Intorno O e D -> raggio
+            // Strategy
+            query.setQuery(new ODQuery());
+            string_query = query.getQuery(query, table) + " AND" + query.getCost();
+            LOG.info("Query: {}", string_query);
 
         }
-        else{
-            // Due casi: voglio stessa O e D
-            //           Qualsiasi O-D con simile distanza 
-          
-            // query.setDLat(Float.parseFloat(dLatS));
-            // query.setOLon(Float.parseFloat(oLonS));
-            // query.setOLat(Float.parseFloat(oLatS));
-            // query.setDLon(Float.parseFloat(dLonS));
+        sqlTemplate(context, string_query, parameters);
+    }
 
-            // System.out.print(query.getDLon());
+    private void getParameters(final RoutingContext context, Map<String, Object> parameters, Query query) {
+        query.setOLat(convertParameters(context, "oLat", null));
+        query.setDLon(convertParameters(context, "dLon", null));
+        query.setDLat(convertParameters(context, "dLat", null));
+        query.setOLon(convertParameters(context, "oLon", null));
 
-            // Map<String, Object> parameters = new HashMap<>();
-            //     parameters.put("oLat", query.getOLat());
-            //     parameters.put("oLon", query.getOLon());
-            //     parameters.put("dLat", query.getDLat());
-            //     parameters.put("dLon", query.getDLon());
-           
-            Float oLat = Float.parseFloat(oLatS);
-            Float oLon =  Float.parseFloat(oLonS);
-            Float dLat =  Float.parseFloat(dLatS);
-            Float dLon =  Float.parseFloat(dLonS);
+        query.setSoglia(convertParameters(context, "soglia", 15000f)); // raggio & soglia
 
-            // Create origin and destination geometry points
-            Map<String, Object> parameters = new HashMap<>();
-                        parameters.put("oLat", oLat);
-                        parameters.put("oLon", oLon);
-                        parameters.put("dLat", dLat);
-                        parameters.put("dLon", dLon);
-            //if(sogliaDist == null){ //voglio stessa O e D
-                LOG.info("Executing DB query to find all quotes...");
+        // costo
+        query.setMaxCost(convertParameters(context, "cmax", 100000000f));
+        query.setMinCost(convertParameters(context, "cmin", 0f));
 
-                //Strategy
-                query.setQuery(new ODQuery());
-                string_query = query.getQuery(query);// + query.getCost();
-                LOG.info("Query: {}", string_query, query.getDLon());
-                sqlTemplate(context, string_query, parameters);
-            //}
-            // // query in base alla distanza 
-            // //getTratta(context, oLat, oLon, dLat, dLon);
-            // LOG.info("Executing DB query to find all tratta with distance=...");
-            // query.setQuery(new DistanceQuery(query));
-            // String string_query = query.
+        // Parameters
+        parameters.put("cmax", query.getMaxCost());
+        parameters.put("cmin", query.getMinCost());
+
+        parameters.put("oLat", query.getOLat());
+        parameters.put("oLon", query.getOLon());
+        parameters.put("dLat", query.getDLat());
+        parameters.put("dLon", query.getDLon());
+
+        parameters.put("soglia", query.getSoglia());
+    }
+
+    private Float convertParameters(RoutingContext context, String name, Float defValue) {
+        // AVVISO todo se non passa parametri
+        String parmString = context.request().getParam(name);
+        Float parm = defValue;
+        if (parmString != null) {
+            parm = Float.parseFloat(parmString);
         }
+        return parm;
     }
 
-    private void sqlTemplate(RoutingContext context, String stringQuery, Map<String, Object> parameters){
-            
-        SqlTemplate.forQuery(db,stringQuery)
-            .rxExecute(parameters)  
-            .doOnError(err -> {
-                LOG.debug("Failure: ", err , err.getMessage());
-                context.response()
-                    .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                    .setStatusCode(500)
-                    .end(new JsonObject().put("error", err.getMessage()).encode());
-            })
-            .doOnSuccess(result -> {
-                LOG.info("Got " + result.size() + " rows ");
-                JsonArray response = new JsonArray();
-                result.forEach(row -> {
-                    JsonObject rowJson = new JsonObject()
-                    .put("dist", row.getValue("dist"))    
-                    .put("id_quotes", row.getValue("id_quotes"))
-                    .put("origin_geom", row.getValue("origin_geom"))
-                    .put("destination_geom", row.getValue("destination_geom"));
-                    response.add(rowJson);
-                });
-                    LOG.info("Path {} responds with {}", context.normalizedPath(), response.encode());
+    private void sqlTemplate(RoutingContext context, String stringQuery, Map<String, Object> parameters) {
+
+        SqlTemplate.forQuery(db, stringQuery)
+                .rxExecute(parameters)
+                .doOnError(err -> {
+                    LOG.debug("Failure: ", err, err.getMessage());
                     context.response()
-                    .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                    .end(response.encode());
-                }).subscribe(succ->{},err -> {
-                LOG.debug("Failure2: ", err , err.getMessage());});
+                            .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
+                            .setStatusCode(500)
+                            .end(new JsonObject().put("error", err.getMessage()).encode());
+                })
+                .doOnSuccess(result -> {
+                    LOG.info("Got " + result.size() + " rows ");
+                    StringBuilder responseStr = new StringBuilder("Numero risultati " + result.size())
+                            .append(", costo compreso tra :" + parameters.get("cmin") + " - " + parameters.get("cmax"))
+                            .append("\n");
+
+                    result.forEach(row -> {
+                        responseStr.append("\t Distanza richiesta: " + convertNum(row, "dist_in"))
+                                .append(" km, distanza: " + convertNum(row, "dist"))
+                                .append(" km, costo: " + row.getValue("costo"))
+                                .append(", idQuota: " + row.getString("id_quotes"))
+                                .append(". \n");
+                    });
+                    LOG.info("Path {} responds with {}", context.normalizedPath(), responseStr.toString());
+                    context.response()
+                            .putHeader(HttpHeaders.CONTENT_TYPE, "text/plain").end(responseStr.toString());
+                }).subscribe(succ -> {
+                }, err -> {
+                    LOG.debug("Failure2: ", err, err.getMessage());
+                });
     }
-    
-    private void getDistance(RoutingContext context){
-            // FIRENZE -> ROMA
-        // oLat="43,7792500"&oLon="11.2462600"&dLat="41.8919300"&dLon="2.5113300"
-        Float oLat = Float.parseFloat(context.request().getParam("oLat"));
-        Float oLon =  Float.parseFloat(context.request().getParam("oLon"));
-        Float dLat =  Float.parseFloat(context.request().getParam("dLat"));
-        Float dLon =  Float.parseFloat(context.request().getParam("dLon"));
 
-        // Create origin and destination geometry points
-        Map<String, Object> parameters = new HashMap<>();
-                    parameters.put("oLat", oLat);
-                    parameters.put("oLon", oLon);
-                    parameters.put("dLat", dLat);
-                    parameters.put("dLon", dLon);
-
-                    //BETWEEN (#{input_distance} - 10) AND (#{input_distance} + 10)
-         // AND ST_DistanceSphere(#{destPoint}, #{originPoint}) < 10000")
-        String input_Ogeo= "ST_SetSRID(ST_MakePoint(#{oLon} , #{oLat}), 4326)";
-        String input_Dgeo= "ST_SetSRID(ST_MakePoint(#{dLon} , #{dLat}), 4326)";
-        String distance = "ST_DistanceSphere("+input_Ogeo+ "," + input_Dgeo + ")"; 
-        String query= "SELECT " + distance +" as dist";
-        SqlTemplate.forQuery(db,query)
-            .rxExecute(parameters)  //TODO
-            .doOnError(err -> {
-                LOG.debug("Failure: ", err , err.getMessage());
-                context.response()
-                    .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                    .setStatusCode(500)
-                    .end(new JsonObject().put("error", err.getMessage()).encode());
-            })
-            .doOnSuccess(result -> {
-                //TODO errore nome sbagliato
-                LOG.info("Got " + result.size() + " rows ");
-                JsonArray response = new JsonArray();
-                result.forEach(row -> {
-                    JsonObject rowJson = new JsonObject()
-                    .put("dist", row.getValue("dist"));    
-                    response.add(rowJson);
-                });
-                    LOG.info("Path {} responds with {}", context.normalizedPath(), response.encode());
-                    context.response()
-                    .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON)
-                    .end(response.encode());
-                }).subscribe(succ->{},err -> {
-                LOG.debug("Failure2: ", err , err.getMessage());});
+    // convertire m in km
+    private String convertNum(Row row, String name) {
+        return df.format(Float.parseFloat(row.getValue(name).toString()) / 1000);
     }
 
 }
-
-
-
-
-
-   
-    // private void getTratta(RoutingContext context, String oLatS, String oLonS, String dLatS,String dLonS){
-    //     // FIRENZE -> ROMA
-    //     // oLat=43,7792500&oLon=11.2462600&dLat=41.8919300&dLon=12.5113300
-    //     // FIRENZE->PISA
-    //     // oLat=43.7792500&oLon=11.2462600&dLat=43.7085300&dLon=10.4036000
-    //     
-    //     Float oLat = Float.parseFloat(oLatS);
-    //     Float oLon =  Float.parseFloat(oLonS);
-    //     Float dLat =  Float.parseFloat(dLatS);
-    //     Float dLon =  Float.parseFloat(dLonS);
-
-    //     // Create origin and destination geometry points
-    //     Map<String, Object> parameters = new HashMap<>();
-    //                 parameters.put("oLat", oLat);
-    //                 parameters.put("oLon", oLon);
-    //                 parameters.put("dLat", dLat);
-    //                 parameters.put("dLon", dLon);
-
-    //      String input_Ogeo= "ST_SetSRID(ST_MakePoint(#{oLon} , #{oLat}), 4326)";
-    //      String input_Dgeo= "ST_SetSRID(ST_MakePoint(#{dLon} , #{dLat}), 4326)";
-    //      String distance = "ST_DistanceSphere("+ input_Ogeo + "," + input_Dgeo + ")"; 
-         
-    //      String string_query= "SELECT *, ST_DistanceSphere(o.origin_geom, o.destination_geom) as dist from schema.quotes o where ST_DistanceSphere(o.origin_geom, o.destination_geom) BETWEEN "+distance+"-10000 AND "+distance+"+10000";
-    //      query.setQuery(new selectTrattaCost());
-    //      sqlTemplate(context, string_query, parameters);
-    // }
