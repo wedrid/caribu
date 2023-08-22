@@ -36,7 +36,7 @@ public class MainVerticle extends AbstractVerticle {
         .andThen(deployVertxRxWeb());
   }
 
-  private Completable  migrateDatabase() {
+  private Completable migrateDatabase() {
     return ConfigLoader.load(vertx)
       .flatMapCompletable(config -> {
         return FlywayMigration.migrate(vertx, config.getDbConfig())

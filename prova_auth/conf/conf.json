@@ -1,6 +1,0 @@
-{
-    "OIDC_CLIENT": "vertx-dev-client",
-    "OIDC_CLIENT_SECRET": "MLW2U31o1zsh0OF13aclRjzJEkXuUoEU",
-    "OIDC_DISCOVERY_URL": "http://localhost:8989/realms/vertx-dev"
-  }
-  

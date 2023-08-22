@@ -32,7 +32,6 @@ public class RoutesManagement extends AbstractVerticle{
         return ConfigLoader.load(vertx)
             .doOnSuccess(configuration -> {
                 LOG.info("Retrieved Configuration: {}", configuration);
-
                 startHttpServerAndAttachRoutes(configuration);
             })
             .doOnError(configuration -> {

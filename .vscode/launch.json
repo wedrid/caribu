@@ -1,0 +1,65 @@
+{
+    // Usare IntelliSense per informazioni sui possibili attributi.
+    // Al passaggio del mouse vengono visualizzate le descrizioni degli attributi esistenti.
+    // Per altre informazioni, visitare: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "MainVerticle",
+            "request": "launch",
+            "mainClass": "com.caribu.rxrequests.MainVerticle",
+            "projectName": "rxrequests"
+        },
+        {
+            "type": "java",
+            "name": "MainVerticle",
+            "request": "launch",
+            "mainClass": "com.caribu.cliente.MainVerticle",
+            "projectName": "cliente"
+        },
+        {
+            "type": "java",
+            "name": "APIGatewayVerticle",
+            "request": "launch",
+            "mainClass": "com.caribu.apigateway.APIGatewayVerticle",
+            "projectName": "apigateway"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "MainVerticle",
+            "request": "launch",
+            "mainClass": "com.caribu.filiale.MainVerticle",
+            "projectName": "filiale",
+            "env": {
+                "SERVER_PORT": "8888",
+                "DB_HOST": "localhost",
+                "DB_PORT": "5432",
+                "DB_DATABASE": "vertx_richieste",
+                "DB_USER": "postgres",
+                "DB_PASSWORD": "secret"
+            }
+        },
+        {
+            "type": "java",
+            "name": "MainVerticle",
+            "request": "launch",
+            "mainClass": "com.caribu.preventivo.MainVerticle",
+            "projectName": "preventivo",
+            "env": {
+                "SERVER_PORT": "8888",
+                "DB_HOST": "localhost",
+                "DB_PORT": "5433",
+                "DB_DATABASE": "vertx_quotes",
+                "DB_USER": "postgres",
+                "DB_PASSWORD": "secret"
+            }
+        }
+    ]
+}
