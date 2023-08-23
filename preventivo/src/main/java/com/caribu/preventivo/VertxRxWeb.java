@@ -4,6 +4,7 @@ import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.json.JsonObject;
 import io.vertx.pgclient.PgConnectOptions;
+import io.vertx.reactivex.servicediscovery.types.HttpEndpoint;
 import io.vertx.rxjava3.core.AbstractVerticle;
 import io.vertx.rxjava3.core.http.HttpHeaders;
 import io.vertx.rxjava3.core.http.HttpServer;
@@ -13,6 +14,7 @@ import io.vertx.rxjava3.ext.web.handler.BodyHandler;
 import io.vertx.rxjava3.ext.web.openapi.RouterBuilder;
 import io.vertx.rxjava3.pgclient.PgPool;
 import io.vertx.rxjava3.sqlclient.Pool;
+import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.sqlclient.PoolOptions;
 
 import org.slf4j.Logger;
@@ -30,6 +32,8 @@ import com.caribu.preventivo.operatorInf.PutOpDatabaseHandler;
 public class VertxRxWeb extends AbstractVerticle {
 
   private static final Logger LOG = LoggerFactory.getLogger(VertxRxWeb.class);
+  private ServiceDiscovery discovery;
+  private final int PORT = 10005; //new port for service quotes
 
   @Override
   public Completable rxStart() {
@@ -46,7 +50,7 @@ public class VertxRxWeb extends AbstractVerticle {
   }
 
   private void startHttpServerAndAttachRoutes(final QuotesConfig configuration) {
-
+    discovery = ServiceDiscovery.create(vertx.getDelegate());
     final var poolOptions = new PoolOptions()
         .setMaxSize(4);
 
@@ -78,10 +82,22 @@ public class VertxRxWeb extends AbstractVerticle {
 
           Single<HttpServer> single = vertx.createHttpServer()
               .requestHandler(restApi)
-              .rxListen(8888, "localhost");
+              .rxListen(PORT, "localhost");
           single.subscribe(
               server -> {
-                LOG.info("Server Start");
+                LOG.info("HTTP server started, attaching to discovery");
+                discovery.publish(
+                  HttpEndpoint.createRecord("quotesapi", "127.0.0.1", PORT, "/"), 
+                  ar -> {
+                    if (ar.succeeded()) {
+                      LOG.info("HTTP server started on port {}", PORT);
+                      LOG.info("Service published on port {}", PORT);
+                    } else {
+                      LOG.error("Error starting the discovery infrastructure");
+                      LOG.info("Error starting the discovery infrastructure");
+                    }
+                  }
+                  );
               },
               failure -> {
                 LOG.error("Server could not start: (1) " + failure.getMessage(), failure);
