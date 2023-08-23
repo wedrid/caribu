@@ -1,0 +1,10 @@
+filiale/target/classes/com/caribu/filiale/operator.class
+filiale/target/classes/com/caribu/filiale/config/BrokerConfig.class
+filiale/target/classes/com/caribu/filiale/config/BrokerConfig$BrokerConfigBuilder.class
+filiale/target/classes/com/caribu/filiale/config/DbConfig.class
+filiale/target/classes/com/caribu/filiale/config/DbConfig$DbConfigBuilder.class
+filiale/target/classes/com/caribu/filiale/db/migration/FlywayMigration.class
+filiale/target/classes/com/caribu/filiale/operatorInf/DeleteOpDatabaseHandler.class
+filiale/target/classes/com/caribu/filiale/operatorInf/GetOpFromDatabaseHandler.class
+filiale/target/classes/com/caribu/filiale/operatorInf/PostOpFromDatabaseHandler.class
+filiale/target/classes/com/caribu/filiale/operatorInf/WatchList.class
