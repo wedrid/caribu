@@ -87,7 +87,7 @@ public class VertxRxWeb extends AbstractVerticle {
               server -> {
                 LOG.info("HTTP server started, attaching to discovery");
                 discovery.publish(
-                  HttpEndpoint.createRecord("quotesapi", "127.0.0.1", PORT, "/"), 
+                  HttpEndpoint.createRecord("quoteapi", "127.0.0.1", PORT, "/"), 
                   ar -> {
                     if (ar.succeeded()) {
                       LOG.info("HTTP server started on port {}", PORT);
