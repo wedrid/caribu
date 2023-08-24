@@ -32,6 +32,15 @@ paths:
       responses:
         '200':
           description: OK
+  /quoteapi/quotes:
+    get:
+      summary: Get all quotes records
+      operationId: listQuotes
+      responses:
+        "200":
+          description: Success
+
+  
   /serviceDiscoveryTrial: 
     get:
       summary: A trial

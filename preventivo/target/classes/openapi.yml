@@ -7,7 +7,7 @@ servers:
     description: My server
 
 paths:
-  /quoteapi/quotes:
+  /quotes:
     get:
       summary: Get all quotes records
       operationId: listQuotes

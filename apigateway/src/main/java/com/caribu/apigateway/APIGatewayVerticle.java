@@ -129,8 +129,15 @@ public class APIGatewayVerticle extends AbstractVerticle {
 
     RouterBuilder.create(this.vertx, "/Users/edrid/Desktop/SWAM/caribu/apigateway/src/main/resources/APIGateway.yaml") //TODO: change to relative path
       .onSuccess(routerBuilder -> {
+        
+        // this works for the "requests api" (i.e. cliente)
         routerBuilder
             .operation("getAllClients")
+            .handler(new DispatchRequestHandler(discovery));
+
+        //TODO: da fare stessa prova ma per quotes
+        routerBuilder
+            .operation("listQuotes")
             .handler(new DispatchRequestHandler(discovery));
           
 
@@ -257,10 +264,10 @@ public class APIGatewayVerticle extends AbstractVerticle {
           superRouter.route("/*").subRouter(functionalRouter);
           
 
-            // create the HTTP server
-            server = vertx.createHttpServer(new HttpServerOptions().setPort(8888).setHost("localhost"));
-            server.requestHandler(superRouter).listen();
-            startPromise.complete();
+          // create the HTTP server
+          server = vertx.createHttpServer(new HttpServerOptions().setPort(8888).setHost("localhost"));
+          server.requestHandler(superRouter).listen();
+          startPromise.complete();
       })
       .onFailure(startPromise::fail);
     });
