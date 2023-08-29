@@ -22,7 +22,6 @@ public class PutClientDetailsFromDatabaseHandler implements Handler<RoutingConte
     public void handle(final RoutingContext context){
         var clientId = CompaniesRestApi.getClientId(context);
         var body = context.body();
-
     }
 }
 

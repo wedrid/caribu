@@ -186,7 +186,7 @@ public class APIGatewayVerticle_copy extends AbstractVerticle {
         
         routerBuilder
             .operation("getAllClients")
-            .handler(new DispatchRequestHandler(discovery));
+            .handler(new DispatchRequestHandler(discovery, vertx));
           
 
         routerBuilder

@@ -78,7 +78,6 @@ public class APIGatewayVerticle extends AbstractVerticle {
   @Override
   public void start(Promise<Void> startPromise) throws Exception {
     
-
     httpClient = vertx.createHttpClient();
     proxy = HttpProxy.reverseProxy(httpClient);
     
@@ -133,12 +132,12 @@ public class APIGatewayVerticle extends AbstractVerticle {
         // this works for the "requests api" (i.e. cliente)
         routerBuilder
             .operation("getAllClients")
-            .handler(new DispatchRequestHandler(discovery));
+            .handler(new DispatchRequestHandler(discovery, vertx));
 
         //TODO: da fare stessa prova ma per quotes
         routerBuilder
             .operation("listQuotes")
-            .handler(new DispatchRequestHandler(discovery));
+            .handler(new DispatchRequestHandler(discovery, vertx));
           
 
         routerBuilder
