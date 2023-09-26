@@ -1,0 +1,1 @@
+ALTER TABLE cache DROP COLUMN id_tratta;
