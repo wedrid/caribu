@@ -23,6 +23,7 @@ public class MainVerticle extends AbstractVerticle {
   public void start(Promise<Void> startPromise) throws Exception {
       System.out.println("MainVerticle started!");
       vertx.eventBus().consumer("added-tratta-address", (message) -> {
+          // loading to cache 
           JsonObject body = (JsonObject) message.body();
           System.out.println(body.toString());
       }); 

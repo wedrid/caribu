@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "MainVerticle",
+            "request": "launch",
+            "mainClass": "com.caribu.richiesta_orm.MainVerticle",
+            "projectName": "richiesta_orm"
+        },
+        {
+            "type": "java",
             "name": "APIGatewayVerticle_copy",
             "request": "launch",
             "mainClass": "com.caribu.apigateway.APIGatewayVerticle_copy",

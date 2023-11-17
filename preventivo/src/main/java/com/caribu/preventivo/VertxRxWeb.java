@@ -41,7 +41,7 @@ public class VertxRxWeb extends AbstractVerticle {
         .doOnSuccess(configuration -> {
           LOG.info("Retrieved Configuration: {}", configuration);
           startHttpServerAndAttachRoutes(configuration);
-          setupEventBus();
+          inteceptNewRequestTrattaEvent();
         })
         .doOnError(configuration -> {
           LOG.info("Errore: {}", configuration);
@@ -49,7 +49,7 @@ public class VertxRxWeb extends AbstractVerticle {
         .ignoreElement();
   }
   //TODO: 
-  private void setupEventBus() {
+  private void inteceptNewRequestTrattaEvent() {
     vertx.eventBus().consumer("added-tratta-address", message -> {
       LOG.info("Received message: {}", message.body());
       JsonObject body = (JsonObject) message.body(); 
