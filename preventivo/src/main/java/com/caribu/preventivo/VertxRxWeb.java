@@ -41,11 +41,20 @@ public class VertxRxWeb extends AbstractVerticle {
         .doOnSuccess(configuration -> {
           LOG.info("Retrieved Configuration: {}", configuration);
           startHttpServerAndAttachRoutes(configuration);
+          setupEventBus();
         })
         .doOnError(configuration -> {
           LOG.info("Errore: {}", configuration);
         })
         .ignoreElement();
+  }
+  //TODO: 
+  private void setupEventBus() {
+    vertx.eventBus().consumer("added-tratta-address", message -> {
+      LOG.info("Received message: {}", message.body());
+      JsonObject body = (JsonObject) message.body(); 
+      System.out.println(body.toString()); //TODO: replace sout with chiamata a calcola cache
+    });
   }
 
   private void startHttpServerAndAttachRoutes(final QuotesConfig configuration) {
