@@ -57,8 +57,6 @@ public class RoutesManagement extends AbstractVerticle{
 
     RouterBuilder.create(vertx, "endpoints.yaml")
         .doOnSuccess(routerBuilder -> { // (1)
-          LOG.info("FUORI router");
-          
           routerBuilder.operation("getAllClients").handler(new RxGetAllClientsHandler(db));
           routerBuilder.operation("addNewClient").handler(new RxAddNewClientHandler(db));
           routerBuilder.operation("createNewRequest").handler(new RxCreateNewRequestHandler(db));
