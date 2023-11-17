@@ -20,6 +20,7 @@ public class MainVerticle extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(MainVerticle.class);
 
   public static void main(String[] args) {
+    // TODO: add support for Hazelcust cluster manager with TCP/IP
     System.out.println("starting main");
     var vertx = Vertx.vertx();
     ClusterManager mgr = new HazelcastClusterManager();
@@ -42,12 +43,13 @@ public class MainVerticle extends AbstractVerticle {
    
   @Override
   public Completable rxStart() {
+    // Deploys the version of the verticle that we want. Version is specified 
     return vertx.rxDeployVerticle(VersionInfoVerticle.class.getName())
         .doOnSuccess(id -> LOG.info("Deployed {} with id {}", VersionInfoVerticle.class.getSimpleName(), id))
         .flatMapCompletable(id -> migrateDatabase()
-          .doOnComplete(() -> LOG.info("Migrated db schema to latest version! "))
+          .doOnComplete(() -> LOG.info("Migrated db schema to latest version! ")) // ask flyway to do migration of the database if necessary. Migrations are in src/main/resources/db/migrations
         )
-        .andThen(deployVertxRxWeb());
+        .andThen(deployVertxRxWeb()); //deploy the web verticle.
   }
 
   private Completable migrateDatabase() {
@@ -60,7 +62,7 @@ public class MainVerticle extends AbstractVerticle {
 
   private Completable deployVertxRxWeb() {
     return vertx.rxDeployVerticle(VertxRxWeb.class.getName(),
-        new DeploymentOptions().setInstances(halfProcessors())
+        new DeploymentOptions().setInstances(halfProcessors()) //set number of processors that the process will use.
     )
     .doOnSuccess(id -> {
         LOG.info("Deployed {} with id {}", VertxRxWeb.class.getSimpleName(), id);

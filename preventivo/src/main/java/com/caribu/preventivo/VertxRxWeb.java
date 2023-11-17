@@ -33,14 +33,13 @@ public class VertxRxWeb extends AbstractVerticle {
 
   private static final Logger LOG = LoggerFactory.getLogger(VertxRxWeb.class);
   private ServiceDiscovery discovery;
-  private final int PORT = 10005; //new port for service quotes
+  private final int PORT = 10005; // new port for service quotes
 
   @Override
   public Completable rxStart() {
     return ConfigLoader.load(vertx)
         .doOnSuccess(configuration -> {
           LOG.info("Retrieved Configuration: {}", configuration);
-
           startHttpServerAndAttachRoutes(configuration);
         })
         .doOnError(configuration -> {
@@ -51,6 +50,7 @@ public class VertxRxWeb extends AbstractVerticle {
 
   private void startHttpServerAndAttachRoutes(final QuotesConfig configuration) {
     discovery = ServiceDiscovery.create(vertx.getDelegate());
+    // database configuration. 
     final var poolOptions = new PoolOptions()
         .setMaxSize(4);
 
@@ -66,7 +66,9 @@ public class VertxRxWeb extends AbstractVerticle {
 
     RouterBuilder.create(vertx, "openapi.yml")
         .doOnSuccess(routerBuilder -> { // (1)
-
+          // The concept of "controller" in vert.x doesn't inheretly exist. The following, could be considered the "controllers".
+          // e.g. routerBuilder.operation("-").handler();
+          // the handler object would be a "mix" of the controller and the "service" or "module" (depending on the terminology is preferred in different contexts)
           routerBuilder.operation("listQuotes").handler(new GetSameTratta(db)); // (3)
           routerBuilder.operation("getQuotes").handler(new GetOpFromDatabaseHandler(db)); // (3)
           // routerBuilder.operation("updateOpAvailability").handler(new

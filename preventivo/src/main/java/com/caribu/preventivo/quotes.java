@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// This is the Model
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
