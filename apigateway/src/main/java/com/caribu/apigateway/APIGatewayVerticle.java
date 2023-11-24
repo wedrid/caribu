@@ -8,6 +8,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.NetworkConfig;
+
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -55,6 +59,7 @@ public class APIGatewayVerticle extends AbstractVerticle {
   private static final Logger LOG = LoggerFactory.getLogger(APIGatewayVerticle.class);
 
   //protected ServiceDiscovery discovery;
+  // HttpServer and Client, istanziati una volta e riusati quando è necessario
   private HttpServer server;
   private HttpClient httpClient; 
 
@@ -68,7 +73,7 @@ public class APIGatewayVerticle extends AbstractVerticle {
   private static final String CALLBACK_URI = "/callback";
   private OAuth2Auth oAuth2Auth;
 
-  
+  //variabile per una prova GET
   final List<JsonObject> pets = new ArrayList<>(Arrays.asList(
     new JsonObject().put("id", 1).put("name", "Fufi").put("tag", "ABC"),
     new JsonObject().put("id", 2).put("name", "Garfield").put("tag", "XYZ"),
@@ -301,8 +306,24 @@ public class APIGatewayVerticle extends AbstractVerticle {
 
 
   public static void main(String[] args) {
-    ClusterManager mgr = new HazelcastClusterManager();
+
+    Config hazelcastConfig = new Config();
+    hazelcastConfig.getNetworkConfig().setPort(6000) // Set the initial port for clustering
+              .setPortAutoIncrement(true);
+
+    NetworkConfig networkConfig = hazelcastConfig.getNetworkConfig();
+
+    // Network configurations for discovery over TCP/IP instead of multicast
+    JoinConfig joinConfig = networkConfig.getJoin();
+    joinConfig.getMulticastConfig().setEnabled(false);
+    joinConfig.getTcpIpConfig().setEnabled(true).addMember("127.0.0.1");
+    // some configuration settings
+    ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
     VertxOptions options = new VertxOptions().setClusterManager(mgr);
+
+
+    //ClusterManager mgr = new HazelcastClusterManager();
+    //VertxOptions options = new VertxOptions().setClusterManager(mgr);
     Vertx
       .clusteredVertx(options, cluster -> {
        if (cluster.succeeded()) {
