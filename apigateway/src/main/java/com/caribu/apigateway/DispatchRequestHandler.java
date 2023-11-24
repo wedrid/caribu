@@ -42,12 +42,15 @@ public class DispatchRequestHandler implements Handler<RoutingContext>{
               String[] parts = context.normalizedPath().split("/", 3);
               String ms_name = parts[1];
               String endpoint_path = "/" + parts[2];
+              JsonObject recordInformation = new JsonObject();
+              recordInformation.put("name", ms_name);
 
               breaker.executeWithFallback(promise -> {
-                discovery.getRecord(new JsonObject().put("name", ms_name))
+                discovery.getRecord(recordInformation)
                   .onComplete(ar -> {
                     if (ar.succeeded() && ar.result() != null) {
                       // Retrieve the service reference
+                      System.out.println("Found record " + recordInformation.getString("name"));
                       ServiceReference reference = discovery.getReference(ar.result());
                       LOG.info("Found and retrieved service");
                       String address = ar.result().getLocation().getString("host");
@@ -76,7 +79,7 @@ public class DispatchRequestHandler implements Handler<RoutingContext>{
                       }); 
                       reference.release();
                     } else {
-                      LOG.info("Not finding the service");
+                      System.out.println("Record not found" + recordInformation.getString("name"));
                       promise.fail("Not finding the service");
                     }
               });

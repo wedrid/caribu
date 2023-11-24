@@ -25,13 +25,21 @@ paths:
       responses:
         '200':
           description: OK
-  /reqapi/clients: 
-    get: 
-      summary: Get all clients
-      operationId: getAllClients
+  /richiesteapi/richieste/{richiestaId}:
+    get:
+      summary: Get a richiesta by ID
+      operationId: getRichiestaById
+      parameters:
+        - in: path
+          name: richiestaId
+          schema:
+            type: integer
+          required: true
       responses:
         '200':
           description: OK
+        '404':
+          description: richiesta not found
   /quoteapi/quotes:
     get:
       summary: Get all quotes records

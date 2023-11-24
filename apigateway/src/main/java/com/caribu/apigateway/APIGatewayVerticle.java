@@ -135,9 +135,13 @@ public class APIGatewayVerticle extends AbstractVerticle {
       .onSuccess(routerBuilder -> {
         
         // this works for the "requests api" (i.e. cliente)
+        // routerBuilder
+        //     .operation("getAllClients")
+        //     .handler(new DispatchRequestHandler(discovery, vertx));
         routerBuilder
-            .operation("getAllClients")
-            .handler(new DispatchRequestHandler(discovery, vertx));
+          .operation("getRichiestaById")
+          .handler(new DispatchRequestHandler(discovery, vertx));
+        
 
         //TODO: da fare stessa prova ma per quotes
         routerBuilder
