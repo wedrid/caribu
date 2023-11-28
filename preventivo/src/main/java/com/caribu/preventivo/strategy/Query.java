@@ -1,8 +1,5 @@
 package com.caribu.preventivo.strategy;
 
-import com.caribu.preventivo.quotesApi.Quotes;
-import com.caribu.preventivo.strategy.StrategyQuery;
-
 import io.vertx.core.json.JsonObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,12 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 public class Query {
-
-  private Quotes quotes;
-
-   public Query(Quotes quotes) {
-       this.quotes = quotes;
-   }
 
   String id_quotes;
   String id_commission;

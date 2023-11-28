@@ -35,8 +35,9 @@ public class AddQuotesCache implements Handler<RoutingContext> {
 
   @Override
   public void handle(final RoutingContext context) {
-
-    System.out.println("QUIIIIII");
+    // Ho una commessa con una certa tratta e seleziono tutti i preventivi che
+    // potrebbero andare bene
+    System.out.println("Cache");
     // in input ho un json
     RequestParameters params = context.get(ValidationHandler.REQUEST_CONTEXT_KEY); // (1)
     JsonObject json = params.body().getJsonObject(); // (2)
@@ -44,17 +45,11 @@ public class AddQuotesCache implements Handler<RoutingContext> {
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("id_commessa", json.getValue("id_commessa"));
-   // parameters.put("id_quotes", json.getValue("id_quotes"));// questo non dovrebbe esserci
     parameters.put("oLat", json.getValue("olat"));
     parameters.put("oLon", json.getValue("olon"));
     parameters.put("dLat", json.getValue("dlat"));
     parameters.put("dLon", json.getValue("dlon"));
-    // parameters.put("lunghezza", json.getValue("lunghezza"));
-    // parameters.put("profondità", json.getValue("profondità"));
-    // parameters.put("larghezza", json.getValue("larghezza"));
-    // parameters.put("id_fornitore", json.getValue("id_fornitore"));
-    // parameters.put("costo", json.getValue("costo"));
-    // parameters.put("operativo", json.getValue("operativo"));
+
     System.out.println("PARAMETERS" + parameters);
 
     String input_Ogeo = "ST_SetSRID(ST_MakePoint(#{oLon} , #{oLat}), 4326)";
@@ -72,22 +67,15 @@ public class AddQuotesCache implements Handler<RoutingContext> {
         })
         .doOnSuccess(result -> {
           LOG.info("Got " + result.size() + " rows ");
-          
+
           result.forEach(row -> {
-         
-            Map<String, Object> parameters_ins = new HashMap<>();
+
+            Quotes quotes = row.toJson().mapTo(Quotes.class);
+            System.out.println("Quotes:  " + quotes.toJsonObject());
+            Map<String, Object> parameters_ins = quotes.toJsonObject().getMap();
+
             parameters_ins.put("id_commessa", parameters.get("id_commessa"));
-            parameters_ins.put("id_quotes", row.getValue("id_quotes"));
-            parameters_ins.put("destination_geom", row.getValue("destination_geom"));
-            parameters_ins.put("origin_geom", row.getValue("origin_geom"));
-            parameters_ins.put("lunghezza", row.getValue("lunghezza"));
-            parameters_ins.put("profondità", row.getValue("profondità"));
-            parameters_ins.put("larghezza", row.getValue("larghezza"));
-            parameters_ins.put("id_fornitore", row.getValue("id_fornitore"));
-            parameters_ins.put("costo", row.getValue("costo"));
-            parameters_ins.put("operativo", row.getValue("operativo"));
-            
-            //inserisco valori nella cache
+            // inserisco valori nella cache
             insertValue(context, parameters_ins);
           });
 
@@ -97,11 +85,9 @@ public class AddQuotesCache implements Handler<RoutingContext> {
 
   private void insertValue(final RoutingContext context, Map<String, Object> parameters_ins) {
     SqlTemplate.forUpdate(db,
-        "INSERT INTO schema.cache VALUES (#{id_commessa},#{id_quotes}, #{operativo}, #{lunghezza}, #{larghezza}, #{profondit\u00E0}, #{id_fornitore}, #{costo}," + //
-            " #{destination_geom}, #{origin_geom})")// +"ON CONFLICT (id_quotes) DO NOTHING\")
-                                                                          // id_commission,id_quotes")//+ "ON CONFLICT
-                                                                          // (#{id_commission},#{id_quotes}) DO
-                                                                          // NOTHING")
+        "INSERT INTO schema.cache VALUES (#{id_commessa},#{id_quotes}, #{id_operativo}, #{lunghezza}, #{larghezza}, #{profondit\u00E0}, #{id_fornitore}, #{costo},"
+            + //
+            " #{destination_geom}, #{origin_geom})")
         .rxExecute(parameters_ins)
         .doOnError(err -> {
           LOG.debug("Failure: ", err, err.getMessage());
@@ -112,3 +98,17 @@ public class AddQuotesCache implements Handler<RoutingContext> {
         }).subscribe();
   }
 }
+
+/*
+ * 
+ * Map<String, Object> parameters_ins = new HashMap<>();
+ * parameters_ins.put("id_quotes", row.getValue("id_quotes"));
+ * parameters_ins.put("destination_geom", row.getValue("destination_geom"));
+ * parameters_ins.put("origin_geom", row.getValue("origin_geom"));
+ * parameters_ins.put("lunghezza", row.getValue("lunghezza"));
+ * parameters_ins.put("profondità", row.getValue("profondità"));
+ * parameters_ins.put("larghezza", row.getValue("larghezza"));
+ * parameters_ins.put("id_fornitore", row.getValue("id_fornitore"));
+ * parameters_ins.put("costo", row.getValue("costo"));
+ * parameters_ins.put("operativo", row.getValue("operativo"));
+ */

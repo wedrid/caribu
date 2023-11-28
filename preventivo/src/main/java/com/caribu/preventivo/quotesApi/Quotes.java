@@ -25,9 +25,9 @@ public class Quotes {
   Integer id_operativo;
   Integer id_fornitore;
 
-  @JsonIgnore
+ // @JsonIgnore
   String origin_geom;
-  @JsonIgnore
+ // @JsonIgnore
   String destination_geom;
 
   // Double olat;

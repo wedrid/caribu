@@ -1,6 +1,6 @@
-= Filiale
+= Filiale_hib
 
-image:https://img.shields.io/badge/vert.x-4.4.1-purple.svg[link="https://vertx.io"]
+image:https://img.shields.io/badge/vert.x-4.5.0-purple.svg[link="https://vertx.io"]
 
 This application was generated using http://start.vertx.io
 
@@ -29,4 +29,10 @@ To run your application:
 * https://discord.gg/6ry7aqPWXy[Vert.x Discord]
 * https://gitter.im/eclipse-vertx/vertx-users[Vert.x Gitter]
 
-
+```
+docker run --name my-postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=vertx_quotes -p 5433:5432 **-e POSTGRES_INITDB_ARGS="--auth="md5""** -d postgis/postgis:15-3.3-alpine
+```
+- 
+```
+docker run --name my-postgres -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=hib -p 5432:5432 -d postgres:13.1-alpine
+```

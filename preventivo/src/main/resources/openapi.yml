@@ -87,7 +87,7 @@ paths:
       responses:
         "204":
           description: No Content
-  /quoteapi/quotes/newComm:
+  /quotes/cache:
     post:
       summary: Add element in cache
       operationId: addQuotesCache
