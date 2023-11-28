@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.caribu.preventivo.config.ConfigLoader;
-import com.caribu.preventivo.db.migration.FlywayMigration;
 
 
 public class MainVerticle extends AbstractVerticle {

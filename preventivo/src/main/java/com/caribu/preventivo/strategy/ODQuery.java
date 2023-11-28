@@ -7,7 +7,7 @@ import java.util.Map;
 public class ODQuery implements StrategyQuery {
 
 	@Override
-	public String createQuery(Query query, String table) {
+	public String createQuery(Query query) {
 		// Stessa origine e destianzione
 		String input_Ogeo = "ST_SetSRID(ST_MakePoint(#{oLon} , #{oLat}), 4326)";
 		String input_Dgeo = "ST_SetSRID(ST_MakePoint(#{dLon} , #{dLat}), 4326)";

@@ -36,7 +36,7 @@ paths:
           description: Quotes added successfully
         "400":
           description: Invalid input
-  /quoteapi/quotes/{id_quotes}:
+  /quotes/{id_quotes}:
     get:
       summary: Get a single quotes record by ID
       operationId: getQuotes
@@ -45,7 +45,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "200":
           description: Success
@@ -111,9 +111,9 @@ components:
       type: object
       properties:
         id_quotes:
-          type: string
-        operativo:
-          type: string
+          type: integer
+        id_operativo:
+          type: integer
         lunghezza:
           type: integer
         larghezza:
@@ -121,9 +121,7 @@ components:
         profondità:
           type: integer
         id_fornitore:
-          type: string
-        id_tratta:
-          type: string
+          type: integer
         costo:
           type: integer
         origin_geom:
@@ -134,12 +132,11 @@ components:
           description: Location in geography(POINT, 4326) format
       required:
         - id_quotes
-        - operativo
+        - id_operativo
         - lunghezza
         - larghezza
         - profondità
         - id_fornitore
-        - id_tratta
         - costo
         - origin_geom
         - destination_geom

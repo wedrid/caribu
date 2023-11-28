@@ -18,7 +18,7 @@ import io.vertx.rxjava3.core.Vertx;
 public class ConfigLoader {
 
   private static final Logger LOG = LoggerFactory.getLogger(ConfigLoader.class);
-  public static final String CONFIG_FILE = "application.yml";
+  public static final String CONFIG_FILE = "./application.yml";
   // Exposed Environment Variables
   public static final String SERVER_PORT = "SERVER_PORT";
   public static final String DB_HOST = "DB_HOST";

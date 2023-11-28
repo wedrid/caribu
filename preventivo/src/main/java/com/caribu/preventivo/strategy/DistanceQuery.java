@@ -3,7 +3,7 @@ package com.caribu.preventivo.strategy;
 /* ConcreteStrategy */
 public class DistanceQuery implements StrategyQuery {
     @Override
-	public String createQuery(Query query, String table){
+	public String createQuery(Query query){
                 // FIRENZE -> ROMA
                 // oLat=43.7792500&oLon=11.2462600&dLat=41.8919300&dLon=12.5113300
                 // FIRENZE->PISA
