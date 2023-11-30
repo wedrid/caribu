@@ -29,6 +29,7 @@ public class DeleteQuotesHandler implements Handler<RoutingContext> {
     LOG.info("Executing DB query to delete:...", id_quotes);
     SqlTemplate.forUpdate(db,
         "DELETE FROM schema.quotes where id_quotes=#{id_quotes}")
+        .mapTo(Quotes.class)
         .rxExecute(Collections.singletonMap("id_quotes", id_quotes))
         .doOnSuccess(result -> {
           LOG.debug("Deleted {} rows for accountId {}", result.rowCount(), id_quotes);

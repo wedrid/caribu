@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory;
 
 import com.caribu.preventivo.config.QuotesConfig;
 import com.caribu.preventivo.quotesApi.AddQuotesCache;
+import com.caribu.preventivo.quotesApi.AddQuotesCache_mess;
 import com.caribu.preventivo.quotesApi.DeleteQuotesHandler;
 import com.caribu.preventivo.quotesApi.GetQuotesHandler;
 import com.caribu.preventivo.quotesApi.GetQuotesSameTratta;
@@ -39,21 +40,35 @@ public class VertxRxWeb extends AbstractVerticle {
         .doOnSuccess(configuration -> {
           LOG.info("Retrieved Configuration: {}", configuration);
           startHttpServerAndAttachRoutes(configuration);
-          inteceptNewRequestTrattaEvent();
+          // test_event(); // TODO eliminare
+          // inteceptNewRequestTrattaEvent();
         })
         .doOnError(configuration -> {
           LOG.info("Errore: {}", configuration);
         })
         .ignoreElement();
   }
+  
+  //TODO eliminare
+  private void test_event() {
+    //oLat=43.7696&oLon=11.2558&dLat=44.6983&dLon=10.6312
+      JsonObject requestData = new JsonObject()
+        .put("id_commessa", 22)
+        .put("oLat", 43.7696)
+        .put("oLon", 11.2558)
+        .put("dLat", 44.6983)
+        .put("dLon", 10.6312);
 
+      vertx.eventBus().send("added-tratta-address", requestData);
+  }
 
-  private void inteceptNewRequestTrattaEvent() {
-    vertx.eventBus().consumer("added-tratta-address", message -> {
-      LOG.info("Received message: {}", message.body());
-      JsonObject body = (JsonObject) message.body();
-      System.out.println(body.toString()); // TODO: replace sout with chiamata a calcola cache
-    });
+  // Event Bus
+  private void inteceptNewRequestTrattaEvent(final Pool db) {
+    vertx.eventBus().consumer("added-tratta-address").handler(new AddQuotesCache_mess(db));//, message -> {
+    // #LOG.info("Received message: {}", message.body());
+      //JsonObject body = (JsonObject) message.body();
+      //System.out.println(body.toString()); // TODO: replace sout with chiamata a calcola cache
+    //});
   }
 
   private void startHttpServerAndAttachRoutes(final QuotesConfig configuration) {
@@ -71,7 +86,7 @@ public class VertxRxWeb extends AbstractVerticle {
     LOG.debug("DB Config: {}", connectOptions.getHost());
 
     final Pool db = PgPool.pool(vertx, connectOptions, poolOptions);
-
+    inteceptNewRequestTrattaEvent(db);
     RouterBuilder.create(vertx, "openapi.yml")
         .doOnSuccess(routerBuilder -> { // (1)
           // The concept of "controller" in vert.x doesn't inheretly exist. The following,
@@ -83,8 +98,10 @@ public class VertxRxWeb extends AbstractVerticle {
           routerBuilder.operation("getQuotes").handler(new GetQuotesHandler(db)); 
           routerBuilder.operation("deleteQuotes").handler(new DeleteQuotesHandler(db));
           routerBuilder.operation("addQuotes").handler(new PostQuotesHandler(db)); 
-          routerBuilder.operation("addQuotesCache").handler(new AddQuotesCache(db)); 
+          routerBuilder.operation("addQuotesCache").handler(new AddQuotesCache(db));
 
+          
+          
           Router restApi = routerBuilder.createRouter();
           restApi.route().handler(BodyHandler.create());
 

@@ -16,6 +16,7 @@ import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.validation.RequestParameters;
+import io.vertx.rxjava3.core.eventbus.Message;
 import io.vertx.rxjava3.ext.web.RoutingContext;
 import io.vertx.rxjava3.ext.web.validation.ValidationHandler;
 import io.vertx.rxjava3.sqlclient.templates.SqlTemplate;
@@ -24,31 +25,34 @@ import io.vertx.rxjava3.sqlclient.Row;
 import io.vertx.rxjava3.sqlclient.RowSet;
 import io.vertx.rxjava3.sqlclient.Tuple;
 
-public class AddQuotesCache implements Handler<RoutingContext> {
+public class AddQuotesCache_mess implements Handler<Message<Object>> {
 
-  private static final Logger LOG = LoggerFactory.getLogger(AddQuotesCache.class);
+  private static final Logger LOG = LoggerFactory.getLogger(AddQuotesCache_mess.class);
   private final Pool db;
 
-  public AddQuotesCache(final Pool db) {
+  public AddQuotesCache_mess(final Pool db) {
     this.db = db;
   }
 
   @Override
-  public void handle(final RoutingContext context) {
+  public void handle(Message<Object> message) {
     // Ho una commessa con una certa tratta e seleziono tutti i preventivi che
     // potrebbero andare bene
-    System.out.println("Cache context");
+    System.out.println("Cache Event");
     // in input ho un json
-    RequestParameters params = context.get(ValidationHandler.REQUEST_CONTEXT_KEY); // (1)
-    JsonObject json = params.body().getJsonObject(); // (2)
-    System.out.println("json:  " + params.body());
+    // RequestParameters params =
+    // message.get(ValidationHandler.REQUEST_CONTEXT_KEY); // (1)
+    // JsonObject json = params.body().getJsonObject(); // (2)
+
+    JsonObject json = (JsonObject) message.body();
+    System.out.println("json:  " + message.body());
 
     Map<String, Object> parameters = new HashMap<>();
     parameters.put("id_commessa", json.getValue("id_commessa"));
-    parameters.put("oLat", json.getValue("olat"));
-    parameters.put("oLon", json.getValue("olon"));
-    parameters.put("dLat", json.getValue("dlat"));
-    parameters.put("dLon", json.getValue("dlon"));
+    parameters.put("oLat", json.getValue("oLat"));
+    parameters.put("oLon", json.getValue("oLon"));
+    parameters.put("dLat", json.getValue("dLat"));
+    parameters.put("dLon", json.getValue("dLon"));
 
     System.out.println("PARAMETERS" + parameters);
 
@@ -76,18 +80,17 @@ public class AddQuotesCache implements Handler<RoutingContext> {
 
             parameters_ins.put("id_commessa", parameters.get("id_commessa"));
             // inserisco valori nella cache
-            insertValue(context, parameters_ins);
+            insertValue(parameters_ins);
           });
 
         }).subscribe();
 
   }
 
-  private void insertValue(final RoutingContext context, Map<String, Object> parameters_ins) {
+  private void insertValue(Map<String, Object> parameters_ins) {
     SqlTemplate.forUpdate(db,
         "INSERT INTO schema.cache VALUES (#{id_commessa},#{id_quotes}, #{id_operativo}, #{lunghezza}, #{larghezza}, #{profondit\u00E0}, #{id_fornitore}, #{costo},"
-            + " #{destination_geom}, #{origin_geom})" 
-            + " ON CONFLICT (id_commessa, id_quotes) DO NOTHING")
+            +" #{destination_geom}, #{origin_geom})" +" ON CONFLICT (id_commessa, id_quotes) DO NOTHING")
         .rxExecute(parameters_ins)
         .doOnError(err -> {
           LOG.debug("Failure: ", err, err.getMessage());

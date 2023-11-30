@@ -69,6 +69,7 @@ public class GetQuotesSameTratta implements Handler<RoutingContext> {
         sqlTemplate(context, string_query, parameters);
     }
 
+    // TODO map
     private void getParameters(final RoutingContext context, Map<String, Object> parameters, Query query) {
         query.setOLat(convertParameters(context, "oLat", null));
         query.setDLon(convertParameters(context, "dLon", null));
