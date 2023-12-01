@@ -12,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.caribu.preventivo.config.ConfigLoader;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.NetworkConfig;
 
 
 public class MainVerticle extends AbstractVerticle {
@@ -22,8 +25,24 @@ public class MainVerticle extends AbstractVerticle {
     // TODO: add support for Hazelcust cluster manager with TCP/IP
     System.out.println("starting main");
     var vertx = Vertx.vertx();
-    ClusterManager mgr = new HazelcastClusterManager();
+    // Cluster options through tcp/ip
+    Config hazelcastConfig = new Config();
+    hazelcastConfig.getNetworkConfig().setPort(6000) // Set the initial port for clustering
+              .setPortAutoIncrement(true);
+
+    NetworkConfig networkConfig = hazelcastConfig.getNetworkConfig();
+
+    // Network configurations for discovery over TCP/IP instead of multicast
+    JoinConfig joinConfig = networkConfig.getJoin();
+    joinConfig.getMulticastConfig().setEnabled(false);
+    joinConfig.getTcpIpConfig().setEnabled(true).addMember("127.0.0.1");
+    // some configuration settings
+    ClusterManager mgr = new HazelcastClusterManager(hazelcastConfig);
     VertxOptions options = new VertxOptions().setClusterManager(mgr);
+
+
+    // ClusterManager mgr = new HazelcastClusterManager();
+    // VertxOptions options = new VertxOptions().setClusterManager(mgr);
     Vertx.rxClusteredVertx(options)
       .flatMap(vertx2 -> vertx2.rxDeployVerticle(new MainVerticle()))
       .ignoreElement()
