@@ -47,7 +47,24 @@ paths:
       responses:
         "200":
           description: Success
-
+  
+  /filialeapi/clientid/{companyName}: 
+    get:
+      summary: Get client id by companyName if exists, creates otherwise and returns the new id
+      operationId: getClientIdByName
+      parameters:
+        - name: companyName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Client found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Client"
   
   /serviceDiscoveryTrial: 
     get:
@@ -100,9 +117,32 @@ paths:
 
 components:
   schemas:
-    Request:
+    Operator:
       type: object
       properties:
         id:
           type: integer
-        # Add other properties for request
+        operatorId:
+          type: integer
+        surname:
+          type: string
+        name:
+          type: string
+      required:
+        - id
+        - name
+        - surname
+        - userId
+    Client:
+      type: object
+      properties:
+        id:
+          type: integer
+        clientId:
+          type: integer
+        companyName:
+          type: string
+      required:
+        - id
+        - clientId
+        - companyName

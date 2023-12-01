@@ -116,7 +116,7 @@ public class APIGatewayVerticle extends AbstractVerticle {
           .setupCallback(callbackRoute);
 
         //securityRouter.route("/hello/*").handler(oauth2handler);
-            
+        
         securityRouter.route("/logout").handler(this::handleLogout);
         //router.route("/private/*").handler(oauth2handler);
         securityRouter.route("/*").handler(oauth2handler);
@@ -146,6 +146,9 @@ public class APIGatewayVerticle extends AbstractVerticle {
         //TODO: da fare stessa prova ma per quotes
         routerBuilder
             .operation("listQuotes")
+            .handler(new DispatchRequestHandler(discovery, vertx));
+        routerBuilder
+            .operation("getClientIdByName")
             .handler(new DispatchRequestHandler(discovery, vertx));
           
 
