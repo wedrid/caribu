@@ -150,6 +150,10 @@ public class APIGatewayVerticle extends AbstractVerticle {
         routerBuilder
             .operation("getClientIdByName")
             .handler(new DispatchRequestHandler(discovery, vertx));
+
+        routerBuilder
+            .operation("createNewRichiesta")
+            .handler(new DispatchRequestHandler(discovery, vertx));
           
 
         routerBuilder
@@ -271,7 +275,7 @@ public class APIGatewayVerticle extends AbstractVerticle {
           // generate the router
           Router superRouter = Router.router(vertx); 
           Router functionalRouter = routerBuilder.createRouter();
-          superRouter.route("/*").subRouter(securityRouter);
+          //superRouter.route("/*").subRouter(securityRouter); FIXME: removed to remove security
           superRouter.route("/*").subRouter(functionalRouter);
           
 
