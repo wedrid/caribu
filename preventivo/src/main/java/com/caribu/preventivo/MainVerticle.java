@@ -1,5 +1,10 @@
 package com.caribu.preventivo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.caribu.preventivo.config.ConfigLoader;
+
 import io.reactivex.rxjava3.core.Completable;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.VertxOptions;
@@ -7,11 +12,6 @@ import io.vertx.core.spi.cluster.ClusterManager;
 import io.vertx.rxjava3.core.AbstractVerticle;
 import io.vertx.rxjava3.core.Vertx;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.caribu.preventivo.config.ConfigLoader;
 
 
 public class MainVerticle extends AbstractVerticle {

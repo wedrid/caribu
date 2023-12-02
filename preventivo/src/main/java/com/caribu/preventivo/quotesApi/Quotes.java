@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 public class Quotes {
 
   Integer id_quotes;
-  // Integer id_commission;
   Integer id_operativo;
   Integer id_fornitore;
 

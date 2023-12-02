@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class Query {
 
   String id_quotes;
-  String id_commission;
+  String id_tratta;
 
   private Float oLat;
   private Float oLon;

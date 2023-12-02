@@ -1,5 +1,17 @@
 package com.caribu.preventivo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.caribu.preventivo.config.ConfigLoader;
+import com.caribu.preventivo.config.QuotesConfig;
+import com.caribu.preventivo.quotesApi.AddQuotesCache;
+import com.caribu.preventivo.quotesApi.AddQuotesCache_mess;
+import com.caribu.preventivo.quotesApi.DeleteQuotesHandler;
+import com.caribu.preventivo.quotesApi.GetQuotesHandler;
+import com.caribu.preventivo.quotesApi.GetQuotesSameTratta;
+import com.caribu.preventivo.quotesApi.PostQuotesHandler;
+
 import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.vertx.core.json.JsonObject;
@@ -16,18 +28,6 @@ import io.vertx.rxjava3.sqlclient.Pool;
 import io.vertx.servicediscovery.ServiceDiscovery;
 import io.vertx.sqlclient.PoolOptions;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.caribu.preventivo.config.QuotesConfig;
-import com.caribu.preventivo.quotesApi.AddQuotesCache;
-import com.caribu.preventivo.quotesApi.AddQuotesCache_mess;
-import com.caribu.preventivo.quotesApi.DeleteQuotesHandler;
-import com.caribu.preventivo.quotesApi.GetQuotesHandler;
-import com.caribu.preventivo.quotesApi.GetQuotesSameTratta;
-import com.caribu.preventivo.quotesApi.PostQuotesHandler;
-import com.caribu.preventivo.config.ConfigLoader;
-
 public class VertxRxWeb extends AbstractVerticle {
 
   private static final Logger LOG = LoggerFactory.getLogger(VertxRxWeb.class);
@@ -40,8 +40,7 @@ public class VertxRxWeb extends AbstractVerticle {
         .doOnSuccess(configuration -> {
           LOG.info("Retrieved Configuration: {}", configuration);
           startHttpServerAndAttachRoutes(configuration);
-          // test_event(); // TODO eliminare
-          // inteceptNewRequestTrattaEvent();
+          test_event(); // TODO eliminare
         })
         .doOnError(configuration -> {
           LOG.info("Errore: {}", configuration);
@@ -49,18 +48,18 @@ public class VertxRxWeb extends AbstractVerticle {
         .ignoreElement();
   }
   
-  //TODO eliminare
+   //TODO eliminare
   private void test_event() {
     //oLat=43.7696&oLon=11.2558&dLat=44.6983&dLon=10.6312
       JsonObject requestData = new JsonObject()
-        .put("id_commessa", 22)
+        .put("id_tratta", 22)
         .put("oLat", 43.7696)
         .put("oLon", 11.2558)
         .put("dLat", 44.6983)
         .put("dLon", 10.6312);
 
       vertx.eventBus().send("added-tratta-address", requestData);
-  }
+  } 
 
   // Event Bus
   private void inteceptNewRequestTrattaEvent(final Pool db) {

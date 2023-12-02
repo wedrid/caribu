@@ -36,7 +36,7 @@ public class AddQuotesCache_mess implements Handler<Message<Object>> {
 
   @Override
   public void handle(Message<Object> message) {
-    // Ho una commessa con una certa tratta e seleziono tutti i preventivi che
+    // Ho una certa tratta e seleziono tutti i preventivi che
     // potrebbero andare bene
     System.out.println("Cache Event");
     // in input ho un json
@@ -48,7 +48,7 @@ public class AddQuotesCache_mess implements Handler<Message<Object>> {
     System.out.println("json:  " + message.body());
 
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("id_commessa", json.getValue("id_commessa"));
+    parameters.put("id_tratta", json.getValue("id_tratta"));
     parameters.put("oLat", json.getValue("oLat"));
     parameters.put("oLon", json.getValue("oLon"));
     parameters.put("dLat", json.getValue("dLat"));
@@ -63,7 +63,7 @@ public class AddQuotesCache_mess implements Handler<Message<Object>> {
     String query = "SELECT *, ST_DistanceSphere(o.origin_geom, o.destination_geom) as dist from schema.quotes o where (ST_DistanceSphere(o.origin_geom, o.destination_geom) BETWEEN "
         + distance + "-10000 AND " + distance + "+10000)";
 
-    // Trovo valori con una distanza simile a distanza nella commessa
+    // Trovo valori con una distanza simile a distanza dell atratta
     SqlTemplate.forQuery(db, query)
         .rxExecute(parameters)
         .doOnError(err -> {
@@ -78,7 +78,7 @@ public class AddQuotesCache_mess implements Handler<Message<Object>> {
             System.out.println("Quotes:  " + quotes.toJsonObject());
             Map<String, Object> parameters_ins = quotes.toJsonObject().getMap();
 
-            parameters_ins.put("id_commessa", parameters.get("id_commessa"));
+            parameters_ins.put("id_tratta", parameters.get("id_tratta"));
             // inserisco valori nella cache
             insertValue(parameters_ins);
           });
@@ -89,8 +89,8 @@ public class AddQuotesCache_mess implements Handler<Message<Object>> {
 
   private void insertValue(Map<String, Object> parameters_ins) {
     SqlTemplate.forUpdate(db,
-        "INSERT INTO schema.cache VALUES (#{id_commessa},#{id_quotes}, #{id_operativo}, #{lunghezza}, #{larghezza}, #{profondit\u00E0}, #{id_fornitore}, #{costo},"
-            +" #{destination_geom}, #{origin_geom})" +" ON CONFLICT (id_commessa, id_quotes) DO NOTHING")
+        "INSERT INTO schema.cache VALUES (#{id_tratta},#{id_quotes}, #{id_operativo}, #{lunghezza}, #{larghezza}, #{profondit\u00E0}, #{id_fornitore}, #{costo},"
+            +" #{destination_geom}, #{origin_geom})" +" ON CONFLICT (id_tratta, id_quotes) DO NOTHING")
         .rxExecute(parameters_ins)
         .doOnError(err -> {
           LOG.debug("Failure: ", err, err.getMessage());
