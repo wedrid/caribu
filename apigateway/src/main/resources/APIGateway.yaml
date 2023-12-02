@@ -25,6 +25,17 @@ paths:
       responses:
         '200':
           description: OK
+  
+  /richiesteapi/richieste: 
+    post: 
+      summary: Create a new richiesta
+      operationId: createNewRichiesta
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad request
+
   /richiesteapi/richieste/{richiestaId}:
     get:
       summary: Get a richiesta by ID
