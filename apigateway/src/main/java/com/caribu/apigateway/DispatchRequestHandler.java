@@ -9,6 +9,7 @@ import io.vertx.circuitbreaker.CircuitBreakerOptions;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.client.WebClient;
@@ -58,25 +59,46 @@ public class DispatchRequestHandler implements Handler<RoutingContext>{
                       LOG.info("Service found at " + address + ":" + port);
                       
                       WebClient client = reference.getAs(WebClient.class);
-
-                      client.request(context.request().method(), endpoint_path)
-                        .putHeaders(context.request().headers())
-                        .send()
-                        .onComplete(response -> {
-                          if (response.succeeded()) {
-                            LOG.info("The other verticle responds with: " + response.result().bodyAsString());
-                            response.result().headers().forEach(header -> {
-                              context.response().putHeader(header.getKey(), header.getValue());
-                            });
-                            context.response()
-                              //.putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON) //TODO: put headers that get with the response
-                              .end(response.result().bodyAsBuffer());
-                            promise.complete(endpoint_path);
-                          } else {
-                            LOG.error("Request failed", response.cause());
-                            promise.fail(response.cause());
-                          }
-                      }); 
+                      if(context.request().method() == HttpMethod.GET){
+                        client.request(context.request().method(), endpoint_path)
+                          .putHeaders(context.request().headers())
+                          .send()
+                          .onComplete(response -> {
+                            if (response.succeeded()) {
+                              LOG.info("The other verticle responds with: " + response.result().bodyAsString());
+                              response.result().headers().forEach(header -> {
+                                context.response().putHeader(header.getKey(), header.getValue());
+                              });
+                              context.response()
+                                //.putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON) //TODO: put headers that get with the response
+                                .end(response.result().bodyAsBuffer());
+                              promise.complete(endpoint_path);
+                            } else {
+                              LOG.error("Request failed", response.cause());
+                              promise.fail(response.cause());
+                            }
+                        }); } else {
+                          System.out.println("HANDLING A POST REQUEST");
+                          client.request(context.request().method(), endpoint_path)
+                          .putHeaders(context.request().headers())
+                          .sendJsonObject(context.body().asJsonObject())
+                          .onComplete(response -> {
+                            if (response.succeeded()) {
+                              LOG.info("The other verticle responds with: " + response.result().bodyAsString());
+                              response.result().headers().forEach(header -> {
+                                context.response().putHeader(header.getKey(), header.getValue());
+                              });
+                              context.response().setStatusCode(201).end();
+                              // context.response()
+                              //   .putHeader(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON) //TODO: put headers that get with the response
+                              //   .end(response.result().bodyAsBuffer());
+                              promise.complete(endpoint_path);
+                            } else {
+                              LOG.error("Request failed", response.cause());
+                              promise.fail(response.cause());
+                            }
+                        });
+                        }
                       reference.release();
                     } else {
                       System.out.println("Record not found" + recordInformation.getString("name"));

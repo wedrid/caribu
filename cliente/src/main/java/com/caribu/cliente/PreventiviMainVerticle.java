@@ -14,9 +14,9 @@ import io.vertx.rxjava3.core.AbstractVerticle;
 import io.vertx.rxjava3.core.Vertx;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 
-public class MainVerticle extends AbstractVerticle {
+public class PreventiviMainVerticle extends AbstractVerticle {
 
-  private static final Logger LOG = LoggerFactory.getLogger(MainVerticle.class);
+  private static final Logger LOG = LoggerFactory.getLogger(PreventiviMainVerticle.class);
   public static final int PORT = 10001;
 
   @Override
@@ -56,10 +56,10 @@ public class MainVerticle extends AbstractVerticle {
   public static void main(String[] args) {
     var vertx = Vertx.vertx();
 
-    vertx.rxDeployVerticle(new MainVerticle())
+    vertx.rxDeployVerticle(new PreventiviMainVerticle())
         .ignoreElement()
         .subscribe(
-            () -> LOG.info("Deployed {} successfully", MainVerticle.class.getSimpleName()),
+            () -> LOG.info("Deployed {} successfully", PreventiviMainVerticle.class.getSimpleName()),
             err -> LOG.error("Failed to deploy_qui:", err)
         );
   }*/
@@ -69,7 +69,7 @@ public class MainVerticle extends AbstractVerticle {
       ClusterManager mgr = new HazelcastClusterManager();
       VertxOptions options = new VertxOptions().setClusterManager(mgr);
       Vertx.rxClusteredVertx(options)
-        .flatMap(vertx2 -> vertx2.rxDeployVerticle(new MainVerticle()))
+        .flatMap(vertx2 -> vertx2.rxDeployVerticle(new PreventiviMainVerticle()))
         .ignoreElement()
         .subscribe(() -> LOG.info("Deployed successfully"), err -> LOG.error("Error: {}", err));
   }
@@ -85,7 +85,7 @@ public class MainVerticle extends AbstractVerticle {
     Vertx
       .clusteredVertx(options, cluster -> {
        if (cluster.succeeded()) {
-           cluster.result().deployVerticle(new MainVerticle(), res -> {
+           cluster.result().deployVerticle(new PreventiviMainVerticle(), res -> {
                if(res.succeeded()){
                    LOG.info("Deployment id is: " + res.result());
                } else {
@@ -101,9 +101,9 @@ public class MainVerticle extends AbstractVerticle {
     //vertx.exceptionHandler(error -> 
     //  LOG.error("Unhandled: {}", error)
     //);
-    //vertx.deployVerticle(new MainVerticle())
+    //vertx.deployVerticle(new PreventiviMainVerticle())
     //  .onFailure(err -> LOG.error("Failed to deploy: ", err))
-    //  .onSuccess(id -> LOG.info("Deployed {} with id {}", MainVerticle.class.getSimpleName(), id));
+    //  .onSuccess(id -> LOG.info("Deployed {} with id {}", PreventiviMainVerticle.class.getSimpleName(), id));
   }
 
   @Override

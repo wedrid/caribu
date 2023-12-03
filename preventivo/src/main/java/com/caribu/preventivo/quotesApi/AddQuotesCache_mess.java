@@ -48,11 +48,11 @@ public class AddQuotesCache_mess implements Handler<Message<Object>> {
     System.out.println("json:  " + message.body());
 
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("id_commessa", json.getValue("id_commessa"));
-    parameters.put("oLat", json.getValue("oLat"));
-    parameters.put("oLon", json.getValue("oLon"));
-    parameters.put("dLat", json.getValue("dLat"));
-    parameters.put("dLon", json.getValue("dLon"));
+    parameters.put("id_commessa", json.getValue("id"));
+    parameters.put("oLat", json.getValue("origLat"));
+    parameters.put("oLon", json.getValue("origLon"));
+    parameters.put("dLat", json.getValue("destLat"));
+    parameters.put("dLon", json.getValue("destLon"));
 
     System.out.println("PARAMETERS" + parameters);
 

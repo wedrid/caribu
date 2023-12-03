@@ -36,6 +36,16 @@ paths:
         '400':
           description: Bad request
 
+  /richiesteapi/tratta:
+    post: 
+        summary: Create a new tratta
+        operationId: createNewTratta
+        responses:
+          '200':
+            description: OK
+          '400':
+            description: Bad request
+
   /richiesteapi/richieste/{richiestaId}:
     get:
       summary: Get a richiesta by ID

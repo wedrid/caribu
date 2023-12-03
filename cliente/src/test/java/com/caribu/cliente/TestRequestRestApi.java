@@ -21,12 +21,12 @@ public class TestRequestRestApi {
 
   @BeforeEach
   void deploy_verticle(Vertx vertx, VertxTestContext testContext) {
-    vertx.deployVerticle(new MainVerticle(), testContext.succeeding(id -> testContext.completeNow()));
+    vertx.deployVerticle(new PreventiviMainVerticle(), testContext.succeeding(id -> testContext.completeNow()));
   }
 
   @Test
   void returns_all_assets(Vertx vertx, VertxTestContext context) throws Throwable {
-    var client = WebClient.create(vertx, new WebClientOptions().setDefaultPort(MainVerticle.PORT));
+    var client = WebClient.create(vertx, new WebClientOptions().setDefaultPort(PreventiviMainVerticle.PORT));
     client.get("/requests")
         .send()
         .onComplete( context.succeeding(response -> {

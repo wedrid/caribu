@@ -154,6 +154,10 @@ public class APIGatewayVerticle extends AbstractVerticle {
         routerBuilder
             .operation("createNewRichiesta")
             .handler(new DispatchRequestHandler(discovery, vertx));
+
+        routerBuilder
+            .operation("createNewTratta")
+            .handler(new DispatchRequestHandler(discovery, vertx));
           
 
         routerBuilder

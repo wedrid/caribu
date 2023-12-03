@@ -17,7 +17,7 @@ public class TestMainVerticle {
   @BeforeEach
   void deploy_verticle(Vertx vertx, VertxTestContext testContext) {
     System.setProperty(ConfigLoader.SERVER_PORT, TEST_SERVER_PORT);
-    vertx.deployVerticle(new MainVerticle(), testContext.succeeding(id -> testContext.completeNow()));
+    vertx.deployVerticle(new PreventiviMainVerticle(), testContext.succeeding(id -> testContext.completeNow()));
   }
 
   @Test
