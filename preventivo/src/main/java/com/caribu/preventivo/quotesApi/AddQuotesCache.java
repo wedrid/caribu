@@ -35,16 +35,16 @@ public class AddQuotesCache implements Handler<RoutingContext> {
 
   @Override
   public void handle(final RoutingContext context) {
-    // Ho una commessa con una certa tratta e seleziono tutti i preventivi che
+    // Ho una tratta e seleziono tutti i preventivi che
     // potrebbero andare bene
     System.out.println("Cache context");
     // in input ho un json
-    RequestParameters params = context.get(ValidationHandler.REQUEST_CONTEXT_KEY); // (1)
-    JsonObject json = params.body().getJsonObject(); // (2)
+    RequestParameters params = context.get(ValidationHandler.REQUEST_CONTEXT_KEY);
+    JsonObject json = params.body().getJsonObject(); 
     System.out.println("json:  " + params.body());
 
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("id_commessa", json.getValue("id_commessa"));
+    parameters.put("id_tratta", json.getValue("id_tratta"));
     parameters.put("oLat", json.getValue("olat"));
     parameters.put("oLon", json.getValue("olon"));
     parameters.put("dLat", json.getValue("dlat"));
@@ -59,7 +59,7 @@ public class AddQuotesCache implements Handler<RoutingContext> {
     String query = "SELECT *, ST_DistanceSphere(o.origin_geom, o.destination_geom) as dist from schema.quotes o where (ST_DistanceSphere(o.origin_geom, o.destination_geom) BETWEEN "
         + distance + "-10000 AND " + distance + "+10000)";
 
-    // Trovo valori con una distanza simile a distanza nella commessa
+    // Trovo valori con una distanza simile a quella della tratta
     SqlTemplate.forQuery(db, query)
         .rxExecute(parameters)
         .doOnError(err -> {
@@ -74,7 +74,7 @@ public class AddQuotesCache implements Handler<RoutingContext> {
             System.out.println("Quotes:  " + quotes.toJsonObject());
             Map<String, Object> parameters_ins = quotes.toJsonObject().getMap();
 
-            parameters_ins.put("id_commessa", parameters.get("id_commessa"));
+            parameters_ins.put("id_tratta", parameters.get("id_tratta"));
             // inserisco valori nella cache
             insertValue(context, parameters_ins);
           });
@@ -85,9 +85,9 @@ public class AddQuotesCache implements Handler<RoutingContext> {
 
   private void insertValue(final RoutingContext context, Map<String, Object> parameters_ins) {
     SqlTemplate.forUpdate(db,
-        "INSERT INTO schema.cache VALUES (#{id_commessa},#{id_quotes}, #{id_operativo}, #{lunghezza}, #{larghezza}, #{profondit\u00E0}, #{id_fornitore}, #{costo},"
+        "INSERT INTO schema.cache VALUES (#{id_tratta},#{id_quotes}, #{id_operativo}, #{lunghezza}, #{larghezza}, #{profondit\u00E0}, #{id_fornitore}, #{costo},"
             + " #{destination_geom}, #{origin_geom})" 
-            + " ON CONFLICT (id_commessa, id_quotes) DO NOTHING")
+            + " ON CONFLICT (id_tratta, id_quotes) DO NOTHING")
         .rxExecute(parameters_ins)
         .doOnError(err -> {
           LOG.debug("Failure: ", err, err.getMessage());

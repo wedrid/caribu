@@ -1,5 +1,10 @@
 package com.caribu.preventivo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.caribu.preventivo.config.ConfigLoader;
+
 import io.reactivex.rxjava3.core.Completable;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.VertxOptions;
