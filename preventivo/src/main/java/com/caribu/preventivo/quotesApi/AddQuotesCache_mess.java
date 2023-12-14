@@ -40,15 +40,11 @@ public class AddQuotesCache_mess implements Handler<Message<Object>> {
     // potrebbero andare bene
     System.out.println("Cache Event");
     // in input ho un json
-    // RequestParameters params =
-    // message.get(ValidationHandler.REQUEST_CONTEXT_KEY); // (1)
-    // JsonObject json = params.body().getJsonObject(); // (2)
-
     JsonObject json = (JsonObject) message.body();
     System.out.println("json:  " + message.body());
 
     Map<String, Object> parameters = new HashMap<>();
-    parameters.put("id_commessa", json.getValue("id"));
+    parameters.put("id_tratta", json.getValue("id"));
     parameters.put("oLat", json.getValue("origLat"));
     parameters.put("oLon", json.getValue("origLon"));
     parameters.put("dLat", json.getValue("destLat"));
@@ -87,6 +83,7 @@ public class AddQuotesCache_mess implements Handler<Message<Object>> {
 
   }
 
+  //subquery
   private void insertValue(Map<String, Object> parameters_ins) {
     SqlTemplate.forUpdate(db,
         "INSERT INTO schema.cache VALUES (#{id_tratta},#{id_quotes}, #{id_operativo}, #{lunghezza}, #{larghezza}, #{profondit\u00E0}, #{id_fornitore}, #{costo},"
