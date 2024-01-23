@@ -24,7 +24,7 @@ public class DeleteQuotesHandler implements Handler<RoutingContext> {
 
   @Override
   public void handle(final RoutingContext context) {
-    final String id_quotes = context.pathParam("id_quotes");
+    final Integer id_quotes = Integer.parseInt(context.pathParam("id_quotes"));
     
     LOG.info("Executing DB query to delete:...", id_quotes);
     SqlTemplate.forUpdate(db,

@@ -83,7 +83,7 @@ paths:
           in: path
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         "204":
           description: No Content

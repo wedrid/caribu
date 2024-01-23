@@ -1,0 +1,15 @@
+POST http://127.0.0.1:10005/quotes HTTP/1.1
+Content-Type: application/json
+
+{ "id_quotes": 12, 
+  "olat":41.8902, 
+  "olon":12.4922, 
+  "dlat":41.8919300, 
+  "dlon":12.5113300, 
+  "lunghezza":10, 
+  "larghezza":10, 
+  "profondità":10, 
+  "costo":10320, 
+  "id_fornitore":13,
+  "id_operativo":4}
+

@@ -1,0 +1,9 @@
+GET http://127.0.0.1:10005/quotes?select=1&oLat=43.7696&oLon=11.2558&dLat=44.6983&dLon=10.6312&cmin=10&cmax=100000&soglia=200000 HTTP/1.1
+
+####
+
+GET http://127.0.0.1:10005/quotes?select=1&oLat=45.4642&oLon=9.1900&dLat=41.8902&dLon=12.4922&cmin=10&cmax=100000&soglia=200000 HTTP/1.1
+
+
+
+#Milano: Latitudine 45.4642, Longitudine 9.1900- Roma: Latitudine 41.8902, Longitudine 12.4922
